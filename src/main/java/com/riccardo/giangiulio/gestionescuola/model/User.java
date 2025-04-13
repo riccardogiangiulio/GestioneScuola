@@ -13,18 +13,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-
 
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,17 +44,10 @@ public class User {
     @Past(message = "The birth date cannot be in the future")
     private LocalDate birthDate;
 
+    @NotNull(message = "The role cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
-    
-    public User(String firstName, String lastName, String email, String password, LocalDate birthDate) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.birthDate = birthDate;
-    }
 
     public User(String firstName, String lastName, String email, String password, LocalDate birthDate, Role role) {
         this.firstName = firstName;
@@ -63,6 +55,6 @@ public class User {
         this.email = email;
         this.password = password;
         this.birthDate = birthDate;
-        this.role = role; 
+        this.role = role;
     }
 }

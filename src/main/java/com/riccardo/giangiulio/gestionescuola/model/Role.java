@@ -13,19 +13,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "roles")
 @Data
+@NoArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(mappedBy = "role")
+    @OneToMany(mappedBy = "roles")
     private Set<User> users = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private ERole name; 
+    private ERole name;
+
+    public Role(ERole name) {
+        this.name = name;
+    }
 }
