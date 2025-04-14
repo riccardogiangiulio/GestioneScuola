@@ -1,9 +1,11 @@
 package com.riccardo.giangiulio.gestionescuola.model;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -46,25 +48,25 @@ public class Exam {
     private Double passingScore;
 
     @NotNull(message = "The classroom cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Classroom classroom;
 
     @NotNull(message = "The subject cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Subject subject;
 
     @NotNull(message = "The school class cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private SchoolClass schoolClass;    
     
     @NotNull(message = "The teacher cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User teacher;
 
-    @ManyToMany(mappedBy = "exams")
-    private Set<Course> courses;
+    @ManyToMany(mappedBy = "exams", fetch = FetchType.LAZY)
+    private Set<Course> courses = new HashSet<>();
 
-    public Exam(String title, String description, LocalDateTime date, Integer duration, Classroom classroom, Subject subject, Double maxScore, Double passingScore, SchoolClass schoolClass, User teacher, Set<Course> courses) {
+    public Exam(String title, String description, LocalDateTime date, Integer duration, Classroom classroom, Subject subject, Double maxScore, Double passingScore, SchoolClass schoolClass, User teacher) {
         this.title = title;
         this.description = description;
         this.date = date;
@@ -75,6 +77,5 @@ public class Exam {
         this.subject = subject;
         this.schoolClass = schoolClass;
         this.teacher = teacher;
-        this.courses = courses;
     }
 }

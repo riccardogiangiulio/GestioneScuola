@@ -3,6 +3,7 @@ package com.riccardo.giangiulio.gestionescuola.model;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,12 +34,12 @@ public class Attendance {
     private LocalDateTime exitTime;
 
     @NotNull(message = "The student cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private User student;
-
+    
     @NotNull(message = "The lesson cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 

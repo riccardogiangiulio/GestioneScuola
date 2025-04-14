@@ -45,7 +45,7 @@ public class User {
     private LocalDate birthDate;
 
     @NotNull(message = "The role cannot be null")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private Role role;
 

@@ -3,6 +3,7 @@ package com.riccardo.giangiulio.gestionescuola.model;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,11 +31,11 @@ public class ExamResult {
     private LocalDateTime date;
 
     @NotNull(message = "The exam cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Exam exam;
 
     @NotNull(message = "The student cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User student;
 
     public ExamResult(Double score, String notes, LocalDateTime date, Exam exam, User student) {

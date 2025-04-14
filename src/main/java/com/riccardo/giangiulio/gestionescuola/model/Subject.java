@@ -1,8 +1,10 @@
 package com.riccardo.giangiulio.gestionescuola.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,11 +32,11 @@ public class Subject {
     private String description;
 
     @NotNull(message = "The teacher cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User teacher;
 
-    @ManyToMany(mappedBy = "subjects")
-    private Set<Course> courses;
+    @ManyToMany(mappedBy = "subjects", fetch = FetchType.LAZY)
+    private Set<Course> courses = new HashSet<>();
 
     public Subject(String name, String description, User teacher) {
         this.name = name;

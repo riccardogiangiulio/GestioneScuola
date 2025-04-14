@@ -3,6 +3,7 @@ package com.riccardo.giangiulio.gestionescuola.model;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,22 +40,22 @@ public class Lesson {
     private LocalDateTime endDateTime;
 
     @NotNull(message = "The school class cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "class_id")
     private SchoolClass schoolClass;
 
     @NotNull(message = "The teacher cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
     @NotNull(message = "The classroom cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "classroom_id")
     private Classroom classroom;
 
     @NotNull(message = "The subject cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "subject_id")
     private Subject subject;
     

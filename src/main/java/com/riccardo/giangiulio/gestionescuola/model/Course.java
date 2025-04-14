@@ -1,9 +1,11 @@
 package com.riccardo.giangiulio.gestionescuola.model;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,21 +43,21 @@ public class Course {
     private BigDecimal price;
 
     @NotNull(message = "The subjects cannot be null")
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "course_subject",
         joinColumns = @JoinColumn(name = "course_id"),
         inverseJoinColumns = @JoinColumn(name = "subject_id")
     )
-    private Set<Subject> subjects;
+    private Set<Subject> subjects = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "course_exam",
         joinColumns = @JoinColumn(name = "course_id"),
         inverseJoinColumns = @JoinColumn(name = "exam_id")
     )
-    private Set<Exam> exams;
+    private Set<Exam> exams = new HashSet<>();
 
     public Course(String title, String description, String duration, BigDecimal price) {
         this.title = title;

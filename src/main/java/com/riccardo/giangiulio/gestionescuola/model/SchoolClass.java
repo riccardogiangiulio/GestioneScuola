@@ -1,8 +1,10 @@
 package com.riccardo.giangiulio.gestionescuola.model;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,31 +32,31 @@ public class SchoolClass {
     private String name;
 
     @NotNull(message = "The course cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "course_id")
     private Course course;
 
     @NotNull(message = "The teachers cannot be null")
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "class_teacher",
         joinColumns = @JoinColumn(name = "class_id"),
         inverseJoinColumns = @JoinColumn(name = "teacher_id")
     )
-    private List<User> teachers;
+    private Set<User> teachers = new HashSet<>();
 
     @NotNull(message = "The registrations cannot be null")
-    @OneToMany(mappedBy = "schoolClass")
-    private List<Registration> registrations;
+    @OneToMany(mappedBy = "schoolClass", fetch = FetchType.LAZY)
+    private Set<Registration> registrations = new HashSet<>();
 
     @NotNull(message = "The max students cannot be empty")
     private Integer maxStudents;
 
-    public SchoolClass(String name, Course course, List<User> teachers, Integer maxStudents) {
+    public SchoolClass(String name, Course course, Integer maxStudents, Set<User> teachers) {
         this.name = name;
         this.course = course;
-        this.teachers = teachers;
         this.maxStudents = maxStudents;
+        this.teachers = teachers;
     }
 }
 
