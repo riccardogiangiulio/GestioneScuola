@@ -30,6 +30,9 @@ public class SchoolClass {
 
     @NotBlank(message = "The name cannot be empty")
     private String name;
+    
+    @NotNull(message = "The max students cannot be empty")
+    private Integer maxStudents;
 
     @NotNull(message = "The course cannot be null")
     @ManyToOne(fetch = FetchType.EAGER)
@@ -48,9 +51,6 @@ public class SchoolClass {
     @NotNull(message = "The registrations cannot be null")
     @OneToMany(mappedBy = "schoolClass", fetch = FetchType.LAZY)
     private Set<Registration> registrations = new HashSet<>();
-
-    @NotNull(message = "The max students cannot be empty")
-    private Integer maxStudents;
 
     public SchoolClass(String name, Course course, Integer maxStudents, Set<User> teachers) {
         this.name = name;
