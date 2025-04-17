@@ -25,19 +25,7 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     
     List<Lesson> findBySubject(Subject subject);
     
-    List<Lesson> findByDateTimeBetween(LocalDateTime start, LocalDateTime end);
-    
-    @Query("SELECT l FROM Lesson l WHERE l.dateTime BETWEEN :start AND :end AND l.classroom = :classroom")
-    List<Lesson> findByDateTimeRangeAndClassroom(
-            @Param("start") LocalDateTime start, 
-            @Param("end") LocalDateTime end, 
-            @Param("classroom") Classroom classroom);
-    
-    @Query("SELECT l FROM Lesson l WHERE l.dateTime BETWEEN :start AND :end AND l.teacher = :teacher")
-    List<Lesson> findByDateTimeRangeAndTeacher(
-            @Param("start") LocalDateTime start, 
-            @Param("end") LocalDateTime end, 
-            @Param("teacher") User teacher);
+    List<Lesson> findByDateTimeBetween(LocalDateTime start, LocalDateTime end);    
     
     @Query("SELECT l FROM Lesson l WHERE l.dateTime >= CURRENT_TIMESTAMP AND l.schoolClass = :schoolClass ORDER BY l.dateTime ASC")
     List<Lesson> findUpcomingLessonsBySchoolClass(@Param("schoolClass") SchoolClass schoolClass);

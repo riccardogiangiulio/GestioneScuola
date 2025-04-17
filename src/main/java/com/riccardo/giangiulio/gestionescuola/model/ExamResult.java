@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +28,7 @@ public class ExamResult {
     @NotBlank(message = "The notes cannot be empty")
     private String notes;
 
+    @Past(message = "The date cannot be in the future")
     @NotNull(message = "The date cannot be null")
     private LocalDateTime date;
 
