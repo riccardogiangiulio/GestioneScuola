@@ -8,12 +8,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.riccardo.giangiulio.gestionescuola.model.Registration;
 import com.riccardo.giangiulio.gestionescuola.model.RegistrationStatus;
 import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.RegistrationRepository;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.RegistrationNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.DuplicateRegistrationException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidStudentException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.SchoolClassFullException;
 
 @Service
 public class RegistrationService {
@@ -45,11 +48,10 @@ public class RegistrationService {
         return registrationRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Registration not found with ID: {}", id);
-                return new RuntimeException("Registration not found with ID: " + id);
+                return new RegistrationNotFoundException(id);
             });
     }
     
-    @Transactional
     public Registration save(Registration registration) {
         log.debug("Saving registration for student {} and school class {}", 
             registration.getStudent().getId(), registration.getSchoolClass().getId());
@@ -74,12 +76,11 @@ public class RegistrationService {
         return updatedRegistration;
     }
     
-    @Transactional
     public void deleteById(Long id) {
         log.warn("Attempting to delete registration with id: {}", id);
         if (!registrationRepository.existsById(id)) {
             log.error("Failed to delete registration: Not found with ID: {}", id);
-            throw new RuntimeException("Registration not found with ID: " + id);
+            throw new RegistrationNotFoundException(id);
         }
         registrationRepository.deleteById(id);
         log.info("Registration deleted successfully with ID: {}", id);
@@ -118,7 +119,7 @@ public class RegistrationService {
             .orElseThrow(() -> {
                 log.error("Registration not found for student {} and school class {}", 
                     student.getId(), schoolClass.getId());
-                return new RuntimeException("Registration not found for this student and school class");
+                return new RegistrationNotFoundException(student.getId(), schoolClass.getId());
             });
     }
     
@@ -154,25 +155,40 @@ public class RegistrationService {
         return registrations;
     }
     
+    @Transactional
+    public Registration changeStatus(Long id, RegistrationStatus newStatus) {
+        log.debug("Changing registration status for id: {} to {}", id, newStatus);
+        
+        Registration registration = findById(id);
+
+        if (registration.getStatus() == newStatus) {
+            log.info("Registration {} already has status {}", id, newStatus);
+            return registration;
+        }
+        registration.setStatus(newStatus);
+        Registration updatedRegistration = registrationRepository.save(registration);
+        log.info("Registration status changed successfully to {} for ID: {}", newStatus, id);
+        
+        return updatedRegistration;
+    }
+    
     private void validateRegistration(Registration registration) {
         if (!userService.isStudent(registration.getStudent())) {
             log.error("Cannot save registration: user {} is not a student", registration.getStudent().getId());
-            throw new RuntimeException("The specified user is not a student");
+            throw new InvalidStudentException(registration.getStudent().getId());
         }
         
         SchoolClass schoolClass = schoolClassService.findById(registration.getSchoolClass().getId());
         if (schoolClassService.isFull(schoolClass.getId())) {
             log.error("Cannot save registration: school class {} is full", schoolClass.getId());
-            throw new RuntimeException("The school class is full");
+            throw new SchoolClassFullException(schoolClass.getId());
         }
         
-        Optional<Registration> existingRegistration = registrationRepository
-            .findByStudentAndSchoolClass(registration.getStudent(), schoolClass);
-        if (existingRegistration.isPresent() && 
-            existingRegistration.get().getStatus() == RegistrationStatus.ACTIVE) {
+        Optional<Registration> existingRegistration = registrationRepository.findByStudentAndSchoolClass(registration.getStudent(), schoolClass);
+        if (existingRegistration.isPresent() && existingRegistration.get().getStatus() == RegistrationStatus.ACTIVE) {
             log.error("Cannot save registration: student {} is already registered in class {}", 
                 registration.getStudent().getId(), schoolClass.getId());
-            throw new RuntimeException("The student is already registered in this class");
+            throw new DuplicateRegistrationException(registration.getStudent().getId(), schoolClass.getId());
         }
     }
 }

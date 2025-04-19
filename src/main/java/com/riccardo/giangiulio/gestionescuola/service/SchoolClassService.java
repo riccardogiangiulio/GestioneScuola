@@ -10,9 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.riccardo.giangiulio.gestionescuola.model.Course;
 import com.riccardo.giangiulio.gestionescuola.model.Registration;
+import com.riccardo.giangiulio.gestionescuola.model.RegistrationStatus;
 import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.SchoolClassRepository;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.SchoolClassNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ActiveRegistrationsException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.MinimumTeachersException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.SchoolClassFullException;
 
 @Service
 public class SchoolClassService {
@@ -43,11 +49,10 @@ public class SchoolClassService {
         return schoolClassRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("School class not found with ID: {}", id);
-                return new RuntimeException("School class not found with ID: " + id);
+                return new SchoolClassNotFoundException(id);
             });
     }
     
-    @Transactional
     public SchoolClass save(SchoolClass schoolClass) {
         log.info("Saving school class: {}", schoolClass.getName());
         validateSchoolClass(schoolClass);
@@ -68,6 +73,21 @@ public class SchoolClassService {
         }
         
         existingSchoolClass.setCourse(schoolClass.getCourse());
+        
+        // Validare che ci sia almeno un insegnante
+        if (schoolClass.getTeachers() == null || schoolClass.getTeachers().isEmpty()) {
+            log.error("School class must have at least one teacher");
+            throw new MinimumTeachersException(id);
+        }
+        
+        // Validare che tutti gli utenti siano insegnanti
+        schoolClass.getTeachers().forEach(teacher -> {
+            if (!userService.isTeacher(teacher)) {
+                log.error("User {} is not a teacher", teacher.getId());
+                throw new InvalidTeacherException(teacher.getId());
+            }
+        });
+        
         existingSchoolClass.setTeachers(schoolClass.getTeachers());
         
         SchoolClass updatedClass = schoolClassRepository.save(existingSchoolClass);
@@ -75,14 +95,14 @@ public class SchoolClassService {
         return updatedClass;
     }
     
-    @Transactional
     public void deleteById(Long id) {
         log.warn("Attempting to delete school class with id: {}", id);
         SchoolClass schoolClass = findById(id);
         
-        if (!schoolClass.getRegistrations().isEmpty()) {
-            log.error("Failed to delete school class: Has {} active registrations", schoolClass.getRegistrations().size());
-            throw new RuntimeException("Cannot delete a class with active registrations");
+        int registrationsCount = schoolClass.getRegistrations().size();
+        if (registrationsCount > 0) {
+            log.error("Failed to delete school class: Has {} active registrations", registrationsCount);
+            throw new ActiveRegistrationsException(id, registrationsCount);
         }
         
         schoolClassRepository.deleteById(id);
@@ -144,7 +164,7 @@ public class SchoolClassService {
         
         if (!userService.isTeacher(teacher)) {
             log.error("Failed to add teacher: User {} is not a teacher", teacherId);
-            throw new RuntimeException("The specified user is not a teacher");
+            throw new InvalidTeacherException(teacherId);
         }
         
         if (schoolClass.getTeachers().stream().anyMatch(t -> t.getId().equals(teacherId))) {
@@ -165,7 +185,7 @@ public class SchoolClassService {
         
         if (schoolClass.getTeachers().size() <= 1) {
             log.error("Failed to remove teacher: School class {} must have at least one teacher", schoolClassId);
-            throw new RuntimeException("A class must have at least one teacher");
+            throw new MinimumTeachersException(schoolClassId);
         }
         
         if (!schoolClass.getTeachers().removeIf(teacher -> teacher.getId().equals(teacherId))) {
@@ -191,6 +211,7 @@ public class SchoolClassService {
         boolean isFull = getAvailableSeats(schoolClassId) == 0;
         if (isFull) {
             log.info("School class {} is full", schoolClassId);
+            throw new SchoolClassFullException(schoolClassId);
         } else {
             log.info("School class {} has available seats", schoolClassId);
         }
@@ -201,7 +222,7 @@ public class SchoolClassService {
         log.debug("Retrieving active registrations for school class: {}", schoolClassId);
         SchoolClass schoolClass = findById(schoolClassId);
         List<Registration> activeRegistrations = schoolClass.getRegistrations().stream()
-                .filter(registration -> registration.getStatus() == com.riccardo.giangiulio.gestionescuola.model.RegistrationStatus.ACTIVE)
+                .filter(registration -> registration.getStatus() == RegistrationStatus.ACTIVE)
                 .toList();
         log.info("Found {} active registrations for school class: {}", activeRegistrations.size(), schoolClassId);
         return activeRegistrations;
@@ -210,18 +231,18 @@ public class SchoolClassService {
     private void validateSchoolClass(SchoolClass schoolClass) {
         if (schoolClass.getMaxStudents() != null && schoolClass.getMaxStudents() <= 0) {
             log.error("Invalid maximum number of students: {}", schoolClass.getMaxStudents());
-            throw new RuntimeException("Maximum number of students must be greater than zero");
+            throw new IllegalArgumentException("Maximum number of students must be greater than zero");
         }
         
         if (schoolClass.getTeachers() == null || schoolClass.getTeachers().isEmpty()) {
             log.error("School class must have at least one teacher");
-            throw new RuntimeException("A class must have at least one teacher");
+            throw new MinimumTeachersException(schoolClass.getId() != null ? schoolClass.getId() : 0L);
         }
         
         schoolClass.getTeachers().forEach(teacher -> {
             if (!userService.isTeacher(teacher)) {
                 log.error("User {} is not a teacher", teacher.getId());
-                throw new RuntimeException("The specified user is not a teacher");
+                throw new InvalidTeacherException(teacher.getId());
             }
         });
     }
@@ -230,7 +251,7 @@ public class SchoolClassService {
         if (maxStudents < currentRegistrations) {
             log.error("Cannot reduce maximum students to {} when there are {} current registrations", 
                 maxStudents, currentRegistrations);
-            throw new RuntimeException("Cannot reduce maximum students below current registrations");
+            throw new IllegalArgumentException("Cannot reduce maximum students below current registrations");
         }
     }
 }

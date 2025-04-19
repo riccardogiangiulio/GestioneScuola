@@ -1,7 +1,6 @@
 package com.riccardo.giangiulio.gestionescuola.service;
 
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,8 @@ import com.riccardo.giangiulio.gestionescuola.model.Course;
 import com.riccardo.giangiulio.gestionescuola.model.Subject;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.SubjectRepository;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.SubjectNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
 
 @Service
 public class SubjectService {
@@ -40,11 +41,10 @@ public class SubjectService {
         return subjectRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Subject not found with ID: {}", id);
-                return new RuntimeException("Subject not found with ID: " + id);
+                return new SubjectNotFoundException(id);
             });
     }
     
-    @Transactional
     public Subject save(Subject subject) {
         log.info("Saving subject: {}", subject.getName());
         if (userService.isTeacher(subject.getTeacher())) {
@@ -53,7 +53,7 @@ public class SubjectService {
             return savedSubject;
         }
         log.error("Failed to save subject: User {} is not a teacher", subject.getTeacher().getId());
-        throw new RuntimeException("The specified user is not a teacher");
+        throw new InvalidTeacherException(subject.getTeacher().getId());
     }
     
     @Transactional
@@ -68,7 +68,7 @@ public class SubjectService {
         }
         else {
             log.error("Failed to update subject: User {} is not a teacher", subject.getTeacher().getId());
-            throw new RuntimeException("The specified user is not a teacher");
+            throw new InvalidTeacherException(subject.getTeacher().getId());
         }
         
         Subject updatedSubject = subjectRepository.save(existingSubject);
@@ -76,39 +76,24 @@ public class SubjectService {
         return updatedSubject;
     }
     
-    @Transactional
     public void deleteById(Long id) {
         log.warn("Attempting to delete subject with id: {}", id);
-        if (!subjectRepository.existsById(id)) {
+        if (subjectRepository.findById(id).isEmpty()) {
             log.error("Failed to delete subject: Not found with ID: {}", id);
-            throw new RuntimeException("Subject not found with ID: " + id);
+            throw new SubjectNotFoundException(id);
         }
         subjectRepository.deleteById(id);
         log.info("Subject deleted successfully with ID: {}", id);
     }
     
-    public List<Subject> findByName(String name) {
+    public Subject findByName(String name) {
         log.debug("Finding subjects by name: {}", name);
-        List<Subject> subjects = subjectRepository.findByName(name);
-        if (subjects.isEmpty()) {
-            log.warn("No subjects found with name: {}", name);
-        } else {
-            log.info("Found {} subjects with name: {}", subjects.size(), name);
-        }
-        return subjects;
+        return subjectRepository.findByName(name).orElseThrow(() -> {
+            log.error("Subject not found with name: {}", name);
+            return new SubjectNotFoundException(name);
+        });
     }
-    
-    public List<Subject> findByNameContaining(String keyword) {
-        log.debug("Finding subjects by name containing: {}", keyword);
-        List<Subject> subjects = subjectRepository.findByNameContainingIgnoreCase(keyword);
-        if (subjects.isEmpty()) {
-            log.warn("No subjects found containing keyword: {}", keyword);
-        } else {
-            log.info("Found {} subjects containing keyword: {}", subjects.size(), keyword);
-        }
-        return subjects;
-    }
-    
+
     public List<Subject> findByCourse(Course course) {
         log.debug("Finding subjects for course: {}", course.getId());
         List<Subject> subjects = subjectRepository.findByCourse(course);
@@ -128,7 +113,7 @@ public class SubjectService {
         
         if (!userService.isTeacher(teacher)) {
             log.error("Failed to assign teacher: User {} is not a teacher", teacherId);
-            throw new RuntimeException("The specified user is not a teacher");
+            throw new InvalidTeacherException(teacherId);
         }
         
         subject.setTeacher(teacher);

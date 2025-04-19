@@ -11,6 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.riccardo.giangiulio.gestionescuola.model.Classroom;
 import com.riccardo.giangiulio.gestionescuola.repository.ClassroomRepository;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.ClassroomNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomCapacityExceededException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
+import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 
 @Service
 public class ClassroomService {
@@ -18,10 +22,12 @@ public class ClassroomService {
     private static final Logger log = LoggerFactory.getLogger(ClassroomService.class);
     
     private final ClassroomRepository classroomRepository;
+    private final SchoolClassService schoolClassService;
     
     @Autowired
-    public ClassroomService(ClassroomRepository classroomRepository) {
+    public ClassroomService(ClassroomRepository classroomRepository, SchoolClassService schoolClassService) {
         this.classroomRepository = classroomRepository;
+        this.schoolClassService = schoolClassService;
         log.info("ClassroomService initialized");
     }
     
@@ -35,7 +41,7 @@ public class ClassroomService {
         return classroomRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Classroom not found with ID: {}", id);
-                return new RuntimeException("Classroom not found with ID: " + id);
+                return new ClassroomNotFoundException(id);
             });
     }
     
@@ -44,7 +50,7 @@ public class ClassroomService {
         log.info("Saving new classroom: {}", classroom.getName());
         if (classroom.getCapacity() <= 0) {
             log.error("Failed to save classroom: Invalid capacity {}", classroom.getCapacity());
-            throw new RuntimeException("Classroom capacity must be greater than 0");
+            throw new ClassroomCapacityExceededException(0L, 0, classroom.getCapacity());
         }
         Classroom savedClassroom = classroomRepository.save(classroom);
         log.info("Classroom saved successfully with ID: {}", savedClassroom.getId());
@@ -58,7 +64,7 @@ public class ClassroomService {
 
         if (!existingClassroomOptional.isPresent()) {
             log.error("Failed to update classroom: Not found with ID: {}", id);
-            throw new RuntimeException("Classroom not found with ID: " + id);
+            throw new ClassroomNotFoundException(id);
         }
 
         Classroom existingClassroom = existingClassroomOptional.get();
@@ -67,7 +73,7 @@ public class ClassroomService {
         
         if (classroom.getCapacity() <= 0) {
             log.error("Failed to update classroom: Invalid capacity {}", classroom.getCapacity());
-            throw new RuntimeException("Classroom capacity must be greater than 0");
+            throw new ClassroomCapacityExceededException(id, 0, classroom.getCapacity());
         }
         
         Classroom updatedClassroom = classroomRepository.save(existingClassroom);
@@ -80,7 +86,7 @@ public class ClassroomService {
         log.warn("Attempting to delete classroom with id: {}", id);
         if (!classroomRepository.existsById(id)) {
             log.error("Failed to delete classroom: Not found with ID: {}", id);
-            throw new RuntimeException("Classroom not found with ID: " + id);
+            throw new ClassroomNotFoundException(id);
         }
         classroomRepository.deleteById(id);
         log.info("Classroom deleted successfully with ID: {}", id);
@@ -101,7 +107,7 @@ public class ClassroomService {
         log.debug("Finding classrooms with minimum capacity of: {}", minCapacity);
         if (minCapacity <= 0) {
             log.error("Invalid minimum capacity specified: {}", minCapacity);
-            throw new RuntimeException("Minimum capacity must be greater than 0");
+            throw new ClassroomCapacityExceededException(0L, 0, minCapacity);
         }
         List<Classroom> classrooms = classroomRepository.findByCapacityGreaterThanEqual(minCapacity);
         log.info("Found {} classrooms with minimum capacity of {}", classrooms.size(), minCapacity);
@@ -112,7 +118,7 @@ public class ClassroomService {
         log.debug("Finding available classrooms between {} and {}", start, end);
         if (start.isAfter(end)) {
             log.error("Invalid time range: start time {} is after end time {}", start, end);
-            throw new RuntimeException("Start time cannot be after end time");
+            throw new InvalidTimeRangeException(start, end);
         }
         List<Classroom> availableClassrooms = classroomRepository.findAvailableClassroomsInTimeRange(start, end);
         if (availableClassrooms.isEmpty()) {
@@ -125,9 +131,22 @@ public class ClassroomService {
     
     public List<Classroom> findWithSufficientCapacityForSchoolClass(Long schoolClassId) {
         log.debug("Finding classrooms with sufficient capacity for school class id: {}", schoolClassId);
+        
+        // Ottieni prima la SchoolClass e il numero di studenti
+        SchoolClass schoolClass = schoolClassService.findById(schoolClassId);
+        int studentCount = schoolClass.getRegistrations().size();
+        
         List<Classroom> classrooms = classroomRepository.findClassroomsWithSufficientCapacityForSchoolClass(schoolClassId);
         if (classrooms.isEmpty()) {
             log.warn("No classrooms found with sufficient capacity for school class ID: {}", schoolClassId);
+            // Trova l'aula con capacità massima per mostrare informazioni utili nell'eccezione
+            List<Classroom> allClassrooms = findAll();
+            int maxCapacity = allClassrooms.stream()
+                               .mapToInt(Classroom::getCapacity)
+                               .max()
+                               .orElse(0);
+            
+            throw new ClassroomCapacityExceededException(schoolClassId, maxCapacity, studentCount);
         } else {
             log.info("Found {} classrooms with sufficient capacity for school class ID: {}", classrooms.size(), schoolClassId);
         }
@@ -138,7 +157,7 @@ public class ClassroomService {
         log.debug("Checking if classroom id {} is available between {} and {}", classroomId, start, end);
         if (start.isAfter(end)) {
             log.error("Invalid time range: start time {} is after end time {}", start, end);
-            throw new RuntimeException("Start time cannot be after end time");
+            throw new InvalidTimeRangeException(start, end);
         }
         
         List<Classroom> availableClassrooms = classroomRepository.findAvailableClassroomsInTimeRange(start, end);
@@ -157,7 +176,7 @@ public class ClassroomService {
         log.debug("Checking if classroom id {} has sufficient capacity of {}", classroomId, requiredCapacity);
         if (requiredCapacity <= 0) {
             log.error("Invalid required capacity specified: {}", requiredCapacity);
-            throw new RuntimeException("Required capacity must be greater than 0");
+            throw new ClassroomCapacityExceededException(classroomId, 0, requiredCapacity);
         }
         
         Classroom classroom = findById(classroomId);

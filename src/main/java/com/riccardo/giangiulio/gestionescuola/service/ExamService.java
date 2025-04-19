@@ -2,7 +2,6 @@ package com.riccardo.giangiulio.gestionescuola.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +16,12 @@ import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.Subject;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.ExamRepository;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.ExamNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomCapacityExceededException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomNotAvailableException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidExamDataException;
 
 @Service
 public class ExamService {
@@ -24,11 +29,20 @@ public class ExamService {
     private static final Logger log = LoggerFactory.getLogger(ExamService.class);
     
     private final ExamRepository examRepository;
+    private final ClassroomService classroomService;
+    private final SchoolClassService schoolClassService;
+    private final UserService userService;
     
     @Autowired
     public ExamService(
-            ExamRepository examRepository) {
+            ExamRepository examRepository,
+            ClassroomService classroomService,
+            SchoolClassService schoolClassService,
+            UserService userService) {
         this.examRepository = examRepository;
+        this.classroomService = classroomService;
+        this.schoolClassService = schoolClassService;
+        this.userService = userService;
         log.info("ExamService initialized");
     }
     
@@ -44,13 +58,16 @@ public class ExamService {
         return examRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Exam not found with ID: {}", id);
-                return new RuntimeException("Exam not found with ID: " + id);
+                return new ExamNotFoundException(id);
             });
     }
     
     @Transactional
     public Exam save(Exam exam) {
-        log.info("Saving exam: {}", exam.getId());
+        log.info("Saving exam: {}", exam.getTitle());
+        
+        validateExam(exam);
+        
         Exam savedExam = examRepository.save(exam);
         log.info("Exam saved successfully with id: {}", savedExam.getId());
         return savedExam;
@@ -59,14 +76,9 @@ public class ExamService {
     @Transactional
     public Exam update(Long id, Exam exam) {
         log.info("Updating exam with id: {}", id);
-        Optional<Exam> existingExamOptional = examRepository.findById(id);
         
-        if (!existingExamOptional.isPresent()) {
-            log.error("Attempting to update non-existent exam with ID: {}", id);
-            throw new RuntimeException("Exam not found with ID: " + id);
-        }
+        Exam existingExam = findById(id);
         
-        Exam existingExam = existingExamOptional.get();
         existingExam.setTitle(exam.getTitle());
         existingExam.setDescription(exam.getDescription());
         existingExam.setDate(exam.getDate());
@@ -78,6 +90,8 @@ public class ExamService {
         existingExam.setSchoolClass(exam.getSchoolClass());
         existingExam.setTeacher(exam.getTeacher());
         
+        validateExam(existingExam);
+        
         Exam updatedExam = examRepository.save(existingExam);
         log.info("Exam updated successfully with ID: {}", id);
         return updatedExam;
@@ -88,7 +102,7 @@ public class ExamService {
         log.warn("Attempting to delete exam with id: {}", id);
         if (!examRepository.existsById(id)) {
             log.error("Attempting to delete non-existent exam with ID: {}", id);
-            throw new RuntimeException("Exam not found with ID: " + id);
+            throw new ExamNotFoundException(id);
         }
         examRepository.deleteById(id);
         log.info("Exam deleted successfully with ID: {}", id);
@@ -164,7 +178,8 @@ public class ExamService {
         log.debug("Finding exams between {} and {}", start, end);
         
         if (start.isAfter(end)) {
-            throw new RuntimeException("Start date cannot be after end date");
+            log.error("Invalid time range: start time {} is after end time {}", start, end);
+            throw new InvalidTimeRangeException(start, end);
         }
         
         return examRepository.findAll().stream()
@@ -174,19 +189,7 @@ public class ExamService {
     }
     
     public List<Exam> findByDateBetween(LocalDateTime start, LocalDateTime end) {
-        log.debug("Finding exams between {} and {}", start, end);
-        if (start.isAfter(end)) {
-            log.error("Invalid time range: start time {} is after end time {}", start, end);
-            throw new RuntimeException("Start time cannot be after end time");
-        }
-        List<Exam> exams = examRepository.findAll().stream()
-                .filter(exam -> !exam.getDate().isBefore(start) && !exam.getDate().isAfter(end))
-                .sorted((e1, e2) -> e1.getDate().compareTo(e2.getDate()))
-                .toList();
-        if (exams.isEmpty()) {
-            log.warn("No exams found in the specified time range");
-        }
-        return exams;
+        return findByDateRange(start, end);
     }
     
     public List<Exam> findUpcomingExams() {
@@ -213,5 +216,51 @@ public class ExamService {
         return exams;
     }
     
-   
+    private void validateExam(Exam exam) {
+        log.debug("Validating exam: {}", exam.getTitle());
+        
+        // Controlli di business essenziali
+        if (exam.getDuration() <= 0) {
+            log.error("Exam duration must be positive: {}", exam.getDuration());
+            throw new InvalidExamDataException("La durata dell'esame deve essere positiva");
+        }
+        
+        if (exam.getMaxScore() <= 0) {
+            log.error("Max score must be positive: {}", exam.getMaxScore());
+            throw new InvalidExamDataException("Il punteggio massimo deve essere positivo");
+        }
+        
+        if (exam.getPassingScore() < 0 || exam.getPassingScore() > exam.getMaxScore()) {
+            log.error("Passing score must be between 0 and max score: {}", exam.getPassingScore());
+            throw new InvalidExamDataException("Il punteggio di sufficienza deve essere compreso tra 0 e il punteggio massimo");
+        }
+        
+        // Controlli che richiedono integrazione con altri servizi
+        Classroom classroom = classroomService.findById(exam.getClassroom().getId());
+        SchoolClass schoolClass = schoolClassService.findById(exam.getSchoolClass().getId());
+        
+        // Verifica capienza aula
+        if (!classroomService.hasSufficientCapacity(classroom.getId(), schoolClass.getRegistrations().size())) {
+            log.warn("Classroom {} has insufficient capacity for school class {}", 
+                classroom.getId(), schoolClass.getId());
+            throw new ClassroomCapacityExceededException(classroom.getId(), classroom.getCapacity(), 
+                schoolClass.getRegistrations().size());
+        }
+        
+        // Verifica che l'insegnante sia valido
+        User teacher = userService.findById(exam.getTeacher().getId());
+        if (!userService.isTeacher(teacher)) {
+            log.error("User {} is not a teacher", teacher.getId());
+            throw new InvalidTeacherException(teacher.getId());
+        }
+        
+        // Verifica disponibilità aula per l'esame
+        LocalDateTime examEnd = exam.getDate().plusMinutes(exam.getDuration());
+        if (!classroomService.isAvailableForTimeSlot(classroom.getId(), exam.getDate(), examEnd)) {
+            log.warn("Classroom {} is not available for exam at {}", classroom.getId(), exam.getDate());
+            throw new ClassroomNotAvailableException(classroom.getId(), exam.getDate(), examEnd);
+        }
+        
+        log.debug("Exam validation completed successfully");
+    }
 }

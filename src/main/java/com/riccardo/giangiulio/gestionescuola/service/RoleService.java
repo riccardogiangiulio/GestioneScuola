@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.riccardo.giangiulio.gestionescuola.model.ERole;
 import com.riccardo.giangiulio.gestionescuola.model.Role;
 import com.riccardo.giangiulio.gestionescuola.repository.RoleRepository;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.RoleNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.DuplicateRoleException;
 
 @Service
 public class RoleService {
@@ -37,23 +39,28 @@ public class RoleService {
         return roleRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Role not found with id: {}", id);
-                return new RuntimeException("Role not found with id: " + id);
+                return new RoleNotFoundException(id);
             });
     }
     
-    public Optional<Role> getRoleByName(ERole name) {
+    public Role getRoleByName(ERole name) {
         log.debug("Finding role by name: {}", name);
-        Optional<Role> role = roleRepository.findByName(name);
-        if (role.isPresent()) {
-            log.info("Found role with name: {}", name);
-        } else {
-            log.warn("Role not found with name: {}", name);
-        }
-        return role;
+        return roleRepository.findByName(name)
+            .orElseThrow(() -> {
+                log.error("Role not found with name: {}", name);
+                return new RoleNotFoundException(name);
+            });
     }
     
     public Role saveRole(Role role) {
         log.info("Saving role: {}", role.getName());
+        // Verifica se il ruolo esiste già
+        Optional<Role> existingRole = roleRepository.findByName(role.getName());
+        if (existingRole.isPresent()) {
+            log.error("Failed to save role: Role with name '{}' already exists", role.getName());
+            throw new DuplicateRoleException(role.getName());
+        }
+        
         Role savedRole = roleRepository.save(role);
         log.info("Role saved successfully with ID: {}", savedRole.getId());
         return savedRole;
@@ -63,7 +70,7 @@ public class RoleService {
         log.warn("Attempting to delete role with id: {}", id);
         if (!roleRepository.existsById(id)) {
             log.error("Failed to delete role: Not found with id: {}", id);
-            throw new RuntimeException("Role not found with id: " + id);
+            throw new RoleNotFoundException(id);
         }
         
         roleRepository.deleteById(id);

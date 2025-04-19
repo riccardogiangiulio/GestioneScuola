@@ -13,6 +13,9 @@ import com.riccardo.giangiulio.gestionescuola.model.Course;
 import com.riccardo.giangiulio.gestionescuola.model.Exam;
 import com.riccardo.giangiulio.gestionescuola.model.Subject;
 import com.riccardo.giangiulio.gestionescuola.repository.CourseRepository;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.CourseNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.SubjectNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.ExamNotFoundException;
 
 @Service
 public class CourseService {
@@ -43,7 +46,7 @@ public class CourseService {
         return courseRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Course not found with ID: {}", id);
-                return new RuntimeException("Course not found with ID: " + id);
+                return new CourseNotFoundException(id);
             });
     }
     
@@ -62,7 +65,7 @@ public class CourseService {
 
         if (!existingCourseOptional.isPresent()) {
             log.error("Failed to update course: Not found with ID: {}", id);
-            throw new RuntimeException("Course not found with ID: " + id);
+            throw new CourseNotFoundException(id);
         }
 
         Course existingCourse = existingCourseOptional.get();
@@ -70,8 +73,7 @@ public class CourseService {
         existingCourse.setDescription(course.getDescription());
         existingCourse.setDuration(course.getDuration());
         existingCourse.setPrice(course.getPrice());
-        existingCourse.setSubjects(course.getSubjects());
-        
+
         Course updatedCourse = courseRepository.save(existingCourse);
         log.info("Course updated successfully with ID: {}", id);
         return updatedCourse;
@@ -82,97 +84,93 @@ public class CourseService {
         log.warn("Attempting to delete course with id: {}", id);
         if (!courseRepository.existsById(id)) {
             log.error("Failed to delete course: Not found with ID: {}", id);
-            throw new RuntimeException("Course not found with ID: " + id);
+            throw new CourseNotFoundException(id);
         }
         courseRepository.deleteById(id);
         log.info("Course deleted successfully with ID: {}", id);
     }
     
-    public List<Course> findByTitle(String title) {
+    public Course findByTitle(String title) {
         log.debug("Finding courses by title: {}", title);
-        List<Course> courses = courseRepository.findByTitle(title);
-        if (courses.isEmpty()) {
-            log.warn("No courses found with title: {}", title);
+        Optional<Course> course = courseRepository.findByTitle(title);
+        if (course.isPresent()) {
+            log.info("Found course with title: {}", title);
+            return course.get();
         } else {
-            log.info("Found {} courses with title: {}", courses.size(), title);
+            log.error("No courses found with title: {}", title);
+            throw new CourseNotFoundException(title);
         }
-        return courses;
-    }
-    
-    public List<Course> findByTitleContaining(String keyword) {
-        log.debug("Finding courses by title containing: {}", keyword);
-        List<Course> courses = courseRepository.findByTitleContainingIgnoreCase(keyword);
-        if (courses.isEmpty()) {
-            log.warn("No courses found containing keyword: {}", keyword);
-        } else {
-            log.info("Found {} courses containing keyword: {}", courses.size(), keyword);
-        }
-        return courses;
     }
     
     @Transactional
-    public Course addSubject(Long courseId, Long subjectId) {
-        log.info("Adding subject {} to course {}", subjectId, courseId);
+    public void addSubject(Long courseId, Long subjectId) {
+        log.info("Attempting to add subject {} to course {}", subjectId, courseId);
+        
+        // Utilizza SubjectService.findById che a sua volta lancia SubjectNotFoundException
         Course course = findById(courseId);
         Subject subject = subjectService.findById(subjectId);
         
-        if (course.getSubjects().stream().anyMatch(s -> s.getId().equals(subjectId))) {
+        if (course.getSubjects().contains(subject)) {
             log.warn("Subject {} is already associated with course {}", subjectId, courseId);
-            return course;
+            return;
         }
         
         course.getSubjects().add(subject);
-        Course updatedCourse = courseRepository.save(course);
-        log.info("Subject {} added successfully to course {}", subjectId, courseId);
-        return updatedCourse;
+        courseRepository.save(course);
+        log.info("Successfully added subject {} to course {}", subjectId, courseId);
     }
     
     @Transactional
-    public Course removeSubject(Long courseId, Long subjectId) {
-        log.warn("Removing subject {} from course {}", subjectId, courseId);
-        Course course = findById(courseId);
+    public void removeSubject(Long courseId, Long subjectId) {
+        log.info("Attempting to remove subject {} from course {}", subjectId, courseId);
         
-        boolean removed = course.getSubjects().removeIf(subject -> subject.getId().equals(subjectId));
-        if (!removed) {
+        // Utilizza CourseService.findById che a sua volta lancia CourseNotFoundException
+        Course course = findById(courseId);
+        Subject subject = subjectService.findById(subjectId);
+        
+        if (!course.getSubjects().contains(subject)) {
             log.warn("Subject {} was not associated with course {}", subjectId, courseId);
-            return course;
+            throw new SubjectNotFoundException(subjectId);
         }
         
-        Course updatedCourse = courseRepository.save(course);
-        log.info("Subject {} removed successfully from course {}", subjectId, courseId);
-        return updatedCourse;
+        course.getSubjects().remove(subject);
+        courseRepository.save(course);
+        log.info("Successfully removed subject {} from course {}", subjectId, courseId);
     }
     
     @Transactional
-    public Course addExam(Long courseId, Long examId) {
+    public void addExam(Long courseId, Long examId) {
         log.info("Adding exam {} to course {}", examId, courseId);
+        
+        // Utilizza ExamService.findById che a sua volta lancia ExamNotFoundException
         Course course = findById(courseId);
         Exam exam = examService.findById(examId);
         
-        if (course.getExams().stream().anyMatch(e -> e.getId().equals(examId))) {
+        if (course.getExams().contains(exam)) {
             log.warn("Exam {} is already associated with course {}", examId, courseId);
-            return course;
+            return;
         }
         
         course.getExams().add(exam);
-        Course updatedCourse = courseRepository.save(course);
+        courseRepository.save(course);
         log.info("Exam {} added successfully to course {}", examId, courseId);
-        return updatedCourse;
     }
     
     @Transactional
-    public Course removeExam(Long courseId, Long examId) {
-        log.warn("Removing exam {} from course {}", examId, courseId);
-        Course course = findById(courseId);
+    public void removeExam(Long courseId, Long examId) {
+        log.info("Attempting to remove exam {} from course {}", examId, courseId);
         
-        boolean removed = course.getExams().removeIf(exam -> exam.getId().equals(examId));
-        if (!removed) {
+        // Utilizza CourseService.findById che a sua volta lancia CourseNotFoundException
+        Course course = findById(courseId);
+        Exam exam = examService.findById(examId);
+        
+        if (!course.getExams().contains(exam)) {
             log.warn("Exam {} was not associated with course {}", examId, courseId);
-            return course;
+            throw new ExamNotFoundException(examId);
         }
         
-        Course updatedCourse = courseRepository.save(course);
+        course.getExams().remove(exam);
+        courseRepository.save(course);
         log.info("Exam {} removed successfully from course {}", examId, courseId);
-        return updatedCourse;
     }
 }

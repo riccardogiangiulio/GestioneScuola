@@ -16,7 +16,11 @@ import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.Subject;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.LessonRepository;
-
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.LessonNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomCapacityExceededException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomNotAvailableException;
 @Service
 public class LessonService {
 
@@ -53,7 +57,7 @@ public class LessonService {
         return lessonRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Lesson not found with ID: {}", id);
-                return new RuntimeException("Lesson not found with ID: " + id);
+                return new LessonNotFoundException(id);
             });
     }
 
@@ -97,7 +101,7 @@ public class LessonService {
         log.debug("Finding lessons between {} and {}", start, end);
         if (start.isAfter(end)) {
             log.error("Invalid time range: start time {} is after end time {}", start, end);
-            throw new RuntimeException("Start time cannot be after end time");
+            throw new InvalidTimeRangeException(start, end);
         }
         List<Lesson> lessons = lessonRepository.findByDateTimeBetween(start, end);
         if (lessons.isEmpty()) {
@@ -130,7 +134,9 @@ public class LessonService {
             lesson.getSubject().getId(), lesson.getTeacher().getId());
         
         validateLesson(lesson);
-        return lessonRepository.save(lesson);
+        Lesson savedLesson = lessonRepository.save(lesson);
+        log.info("Lesson saved successfully with ID: {}", savedLesson.getId());
+        return savedLesson;
     }
 
     @Transactional
@@ -140,7 +146,7 @@ public class LessonService {
 
         if (!existingLessonOptional.isPresent()) {
             log.error("Attempting to update non-existent lesson with ID: {}", id);
-            throw new RuntimeException("Lesson not found with ID: " + id);
+            throw new LessonNotFoundException(id);
         }
 
         Lesson existingLesson = existingLessonOptional.get();
@@ -152,7 +158,9 @@ public class LessonService {
         existingLesson.setSubject(lesson.getSubject());
         
         validateLesson(existingLesson);
-        return lessonRepository.save(existingLesson);
+        Lesson updatedLesson = lessonRepository.save(existingLesson);
+        log.info("Lesson updated successfully with ID: {}", id);
+        return updatedLesson;
     }
 
     @Transactional
@@ -160,62 +168,54 @@ public class LessonService {
         log.debug("Deleting lesson with id: {}", id);
         if (!lessonRepository.existsById(id)) {
             log.error("Attempting to delete non-existent lesson with ID: {}", id);
-            throw new RuntimeException("Lesson not found with ID: " + id);
+            throw new LessonNotFoundException(id);
         }
         lessonRepository.deleteById(id);
+        log.info("Lesson deleted successfully with ID: {}", id);
     }
 
     private void validateLesson(Lesson lesson) {
+        log.debug("Validating lesson for school class {} and teacher {}", 
+            lesson.getSchoolClass().getId(), lesson.getTeacher().getId());
+        
         // Validazione della relazione temporale tra start e end
         if (lesson.getEndDateTime().isBefore(lesson.getStartDateTime())) {
             log.warn("Attempting to save lesson with invalid end date and time: {}", lesson.getEndDateTime());
-            throw new RuntimeException("Lesson end date and time cannot be before start date and time");
+            throw new InvalidTimeRangeException(lesson.getStartDateTime(), lesson.getEndDateTime());
         }
         
-        // Validazioni di business con servizi esterni
-        try {
-            Classroom classroom = classroomService.findById(lesson.getClassroom().getId());
-            if (!classroomService.hasSufficientCapacity(classroom.getId(), lesson.getSchoolClass().getRegistrations().size())) {
-                log.warn("Classroom {} has insufficient capacity for school class {}", 
-                    classroom.getId(), lesson.getSchoolClass().getId());
-                throw new RuntimeException("Classroom capacity is insufficient for the school class");
-            }
-        } catch (RuntimeException e) {
-            log.error("Invalid classroom ID {} in lesson validation", lesson.getClassroom().getId());
-            throw new RuntimeException("Invalid classroom ID: " + lesson.getClassroom().getId());
+        // Verifica che l'aula esista e abbia capacità sufficiente
+        Classroom classroom = classroomService.findById(lesson.getClassroom().getId());
+        if (!classroomService.hasSufficientCapacity(classroom.getId(), lesson.getSchoolClass().getRegistrations().size())) {
+            log.warn("Classroom {} has insufficient capacity for school class {}", 
+                classroom.getId(), lesson.getSchoolClass().getId());
+            throw new ClassroomCapacityExceededException(classroom.getId(), classroom.getCapacity(), 
+                lesson.getSchoolClass().getRegistrations().size());
         }
         
-        try {
-            User teacher = userService.findById(lesson.getTeacher().getId());
-            if (!userService.isTeacher(teacher)) {
-                log.error("Attempting to save lesson with non-teacher user ID: {}", teacher.getId());
-                throw new RuntimeException("The specified user is not a teacher");
-            }
-        } catch (RuntimeException e) {
-            log.error("Invalid teacher ID {} in lesson validation", lesson.getTeacher().getId());
-            throw new RuntimeException("Invalid teacher ID: " + lesson.getTeacher().getId());
+        // Verifica che l'insegnante esista e sia effettivamente un insegnante
+        User teacher = userService.findById(lesson.getTeacher().getId());
+        if (!userService.isTeacher(teacher)) {
+            log.error("Attempting to save lesson with non-teacher user ID: {}", teacher.getId());
+            throw new InvalidTeacherException(teacher.getId());
         }
         
-        try {
-            schoolClassService.findById(lesson.getSchoolClass().getId());
-        } catch (RuntimeException e) {
-            log.error("Invalid school class ID {} in lesson validation", lesson.getSchoolClass().getId());
-            throw new RuntimeException("Invalid school class ID: " + lesson.getSchoolClass().getId());
-        }
+        // Verifica che la classe scolastica esista
+        schoolClassService.findById(lesson.getSchoolClass().getId());
+
+        // Verifica che la materia esista
+        subjectService.findById(lesson.getSubject().getId());
         
-        try {
-            subjectService.findById(lesson.getSubject().getId());
-        } catch (RuntimeException e) {
-            log.error("Invalid subject ID {} in lesson validation", lesson.getSubject().getId());
-            throw new RuntimeException("Invalid subject ID: " + lesson.getSubject().getId());
-        }
-        
+        // Verifica che l'aula sia disponibile nel periodo richiesto
         if (!classroomService.isAvailableForTimeSlot(
             lesson.getClassroom().getId(), 
             lesson.getStartDateTime(), 
             lesson.getEndDateTime())) {
             log.warn("Classroom {} is not available in the specified time slot", lesson.getClassroom().getId());
-            throw new RuntimeException("Classroom is not available in the specified time slot");
+            throw new ClassroomNotAvailableException(lesson.getClassroom().getId(), 
+                lesson.getStartDateTime(), lesson.getEndDateTime());
         }
+        
+        log.debug("Lesson validation completed successfully");
     }
 } 

@@ -13,6 +13,10 @@ import com.riccardo.giangiulio.gestionescuola.model.Lesson;
 import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.AttendanceRepository;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.AttendanceNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidStudentException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.TimeOutOfBoundsExceptions;
 
 @Service
 public class AttendanceService {
@@ -44,7 +48,7 @@ public class AttendanceService {
         return attendanceRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Attendance not found with ID: {}", id);
-                return new RuntimeException("Attendance not found with ID: " + id);
+                return new AttendanceNotFoundException(id);
             });
     }
     
@@ -79,7 +83,7 @@ public class AttendanceService {
         log.warn("Attempting to delete attendance with id: {}", id);
         if (!attendanceRepository.existsById(id)) {
             log.error("Failed to delete attendance: Not found with ID: {}", id);
-            throw new RuntimeException("Attendance not found with ID: " + id);
+            throw new AttendanceNotFoundException(id);
         }
         attendanceRepository.deleteById(id);
         log.info("Attendance deleted successfully with ID: {}", id);
@@ -108,7 +112,7 @@ public class AttendanceService {
         return attendanceRepository.findByLessonAndStudent(lesson, student)
             .orElseThrow(() -> {
                 log.error("Attendance not found for lesson {} and student {}", lesson.getId(), student.getId());
-                return new RuntimeException("Attendance not found for this lesson and student");
+                return new AttendanceNotFoundException(lesson.getId(), student.getId());
             });
     }
     
@@ -144,14 +148,14 @@ public class AttendanceService {
         // Verifica che l'utente sia uno studente
         if (!userService.isStudent(attendance.getStudent())) {
             log.error("Cannot save attendance: user {} is not a student", attendance.getStudent().getId());
-            throw new RuntimeException("The specified user is not a student");
+            throw new InvalidStudentException(attendance.getStudent().getId());
         }
         
         // Verifica che l'orario di uscita sia dopo l'orario di entrata
         if (attendance.getExitTime().isBefore(attendance.getEntryTime())) {
             log.error("Invalid exit time: {} is before entry time {}", 
                 attendance.getExitTime(), attendance.getEntryTime());
-            throw new RuntimeException("Exit time cannot be before entry time");
+            throw new InvalidTimeRangeException(attendance.getEntryTime(), attendance.getExitTime());
         }
         
         // Verifica che l'orario di entrata e uscita siano compatibili con l'orario della lezione
@@ -159,7 +163,7 @@ public class AttendanceService {
         if (attendance.getEntryTime().isBefore(lesson.getStartDateTime()) || 
             attendance.getExitTime().isAfter(lesson.getEndDateTime())) {
             log.error("Attendance times are outside lesson time range");
-            throw new RuntimeException("Attendance times must be within lesson time range");
+            throw new TimeOutOfBoundsExceptions(lesson.getStartDateTime(), attendance.getEntryTime(), attendance.getExitTime());
         }
     }
 }
