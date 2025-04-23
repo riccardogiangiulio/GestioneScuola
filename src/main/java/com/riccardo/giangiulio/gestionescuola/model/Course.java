@@ -16,13 +16,9 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Data
 @Table(name = "courses")
-@NoArgsConstructor
 public class Course {
 
     @Id
@@ -59,6 +55,10 @@ public class Course {
     )
     private Set<Exam> exams = new HashSet<>();
 
+    public Course() {
+
+    }
+
     public Course(String title, String description, String duration, BigDecimal price) {
         this.title = title;
         this.description = description;
@@ -73,5 +73,70 @@ public class Course {
         this.price = price;
         this.subjects = subjects;
         this.exams = exams;
+    }
+
+    public Long getId() {
+        return id;
+    }   
+
+    public String getTitle() {
+        return title;
+    }   
+
+    public String getDescription() {
+        return description;
+    }   
+
+    public String getDuration() {
+        return duration;
+    }   
+
+    public BigDecimal getPrice() {
+        return price;
+    }   
+
+    public Set<Subject> getSubjects() {
+        return subjects;
+    }   
+
+    public Set<Exam> getExams() {
+        return exams;
+    }   
+
+    public void setTitle(String title) {
+        this.title = title;
+    }   
+
+    public void setDescription(String description) {
+        this.description = description;
+    }   
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }   
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }   
+
+    public void setSubjects(Set<Subject> subjects) {
+        this.subjects = subjects;
+    }   
+
+    public void setExams(Set<Exam> exams) {
+        this.exams = exams;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Course course = (Course) o;
+        return id != null ? id.equals(course.id) : course.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 }

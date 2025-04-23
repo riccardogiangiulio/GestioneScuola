@@ -25,11 +25,11 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     
     List<Lesson> findBySubject(Subject subject);
     
-    List<Lesson> findByDateTimeBetween(LocalDateTime start, LocalDateTime end);    
+    List<Lesson> findByStartDateTimeBetween(LocalDateTime start, LocalDateTime end);    
     
-    @Query("SELECT l FROM Lesson l WHERE l.dateTime >= CURRENT_TIMESTAMP AND l.schoolClass = :schoolClass ORDER BY l.dateTime ASC")
+    @Query("SELECT l FROM Lesson l WHERE l.startDateTime >= CURRENT_TIMESTAMP AND l.schoolClass = :schoolClass ORDER BY l.startDateTime ASC")
     List<Lesson> findUpcomingLessonsBySchoolClass(@Param("schoolClass") SchoolClass schoolClass);
     
-    @Query("SELECT l FROM Lesson l WHERE DATE(l.dateTime) = CURRENT_DATE")
+    @Query(value = "SELECT * FROM lessons l WHERE DATE(l.start_date_time) = CURRENT_DATE", nativeQuery = true)
     List<Lesson> findTodayLessons();
 }

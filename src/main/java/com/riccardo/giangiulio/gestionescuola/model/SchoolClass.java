@@ -16,13 +16,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@Table(name = "school-classes")
-@NoArgsConstructor
+@Table(name = "school_classes")
 public class SchoolClass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,13 +48,73 @@ public class SchoolClass {
     @OneToMany(mappedBy = "schoolClass", fetch = FetchType.LAZY)
     private Set<Registration> registrations = new HashSet<>();
 
+    public SchoolClass() {
+    
+    }   
+
     public SchoolClass(String name, Course course, Integer maxStudents, Set<User> teachers) {
         this.name = name;
         this.course = course;
         this.maxStudents = maxStudents;
         this.teachers = teachers;
     }
-}
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getMaxStudents() {
+        return maxStudents;
+    }
+
+    public Course getCourse() {
+        return course;
+    }   
+
+    public Set<User> getTeachers() {
+        return teachers;
+    }      
+
+    public Set<Registration> getRegistrations() {
+        return registrations;
+    }      
+
+    public void setName(String name) {
+        this.name = name;
+    }   
+
+    public void setMaxStudents(Integer maxStudents) {
+        this.maxStudents = maxStudents;
+    }      
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }   
+
+    public void setTeachers(Set<User> teachers) {
+        this.teachers = teachers;
+    }   
+
+    public void setRegistrations(Set<Registration> registrations) {
+        this.registrations = registrations;
+    }   
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SchoolClass that = (SchoolClass) o;
+        return id != null ? id.equals(that.id) : that.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+}
 
 

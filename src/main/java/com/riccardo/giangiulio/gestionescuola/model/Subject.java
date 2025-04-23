@@ -13,13 +13,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Entity
-@Data
 @Table(name = "subjects")
-@NoArgsConstructor
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +35,62 @@ public class Subject {
     @ManyToMany(mappedBy = "subjects", fetch = FetchType.LAZY)
     private Set<Course> courses = new HashSet<>();
 
+    public Subject() {
+    }   
+
     public Subject(String name, String description, User teacher) {
         this.name = name;
         this.description = description;
         this.teacher = teacher;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }   
+
+    public User getTeacher() {
+        return teacher;
+    }   
+
+    public Set<Course> getCourses() {
+        return courses;
+    }   
+
+    public void setName(String name) {
+        this.name = name;
+    }   
+
+    public void setDescription(String description) {
+        this.description = description;
+    }   
+
+    public void setTeacher(User teacher) {
+        this.teacher = teacher;
+    }   
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
+    }   
+    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Subject subject = (Subject) o;
+        return id != null ? id.equals(subject.id) : subject.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 }

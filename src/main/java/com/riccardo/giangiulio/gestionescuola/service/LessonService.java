@@ -10,17 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.LessonNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomCapacityExceededException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomNotAvailableException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
 import com.riccardo.giangiulio.gestionescuola.model.Classroom;
 import com.riccardo.giangiulio.gestionescuola.model.Lesson;
 import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.Subject;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.LessonRepository;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.LessonNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomCapacityExceededException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomNotAvailableException;
+
 @Service
 public class LessonService {
 
@@ -103,7 +104,7 @@ public class LessonService {
             log.error("Invalid time range: start time {} is after end time {}", start, end);
             throw new InvalidTimeRangeException(start, end);
         }
-        List<Lesson> lessons = lessonRepository.findByDateTimeBetween(start, end);
+        List<Lesson> lessons = lessonRepository.findByStartDateTimeBetween(start, end);
         if (lessons.isEmpty()) {
             log.warn("No lessons found in the specified time range");
         }

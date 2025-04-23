@@ -17,19 +17,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     Optional<User> findByEmail(String email);
     
-    List<User> findByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(String name, String surname);
-    
-    @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = :role")
+    @Query("SELECT u FROM User u WHERE u.role.name = :role")
     List<User> findByRole(@Param("role") ERole role);
     
-    @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = 'ROLE_STUDENT' AND u.id IN " +
+    @Query("SELECT u FROM User u WHERE u.role.name = 'ROLE_STUDENT' AND u.id IN " +
            "(SELECT DISTINCT reg.student.id FROM Registration reg WHERE reg.schoolClass = :schoolClass AND reg.status = 'ACTIVE')")
     List<User> findStudentsBySchoolClass(@Param("schoolClass") SchoolClass schoolClass);
     
-    @Query("SELECT DISTINCT t FROM SchoolClass sc JOIN sc.teachers t WHERE sc = :schoolClass")
-    List<User> findTeachersBySchoolClass(@Param("schoolClass") SchoolClass schoolClass);
+    @Query(value = "SELECT u.* FROM users u JOIN school_class_teacher sct ON u.id = sct.teacher_id WHERE sct.school_class_id = :schoolClassId", nativeQuery = true)
+    List<User> findTeachersBySchoolClass(@Param("schoolClassId") Long schoolClassId);
     
-    @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = 'ROLE_STUDENT' AND u.id NOT IN " +
+    @Query("SELECT u FROM User u WHERE u.role.name = 'ROLE_STUDENT' AND u.id NOT IN " +
            "(SELECT DISTINCT reg.student.id FROM Registration reg WHERE reg.status = 'ACTIVE')")
     List<User> findStudentsWithoutActiveRegistrations();
 }

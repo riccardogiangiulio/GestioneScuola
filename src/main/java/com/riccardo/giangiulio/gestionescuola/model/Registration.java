@@ -1,6 +1,7 @@
 package com.riccardo.giangiulio.gestionescuola.model;
 
 import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,13 +13,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Data
 @Table(name = "registrations")
-@NoArgsConstructor
 public class Registration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +40,10 @@ public class Registration {
     @JoinColumn(name = "class_id")
     private SchoolClass schoolClass;
 
+    public Registration() {
+    
+    }
+
     public Registration(User student, Course course, SchoolClass schoolClass) {
         this.registrationDate = LocalDateTime.now();
         this.student = student;
@@ -50,6 +51,62 @@ public class Registration {
         this.schoolClass = schoolClass;
         this.status = RegistrationStatus.ACTIVE;
     }
-}
 
+    public Long getId() {
+        return id;
+    }
+
+    public LocalDateTime getRegistrationDate() {
+        return registrationDate;    
+    }
+
+    public RegistrationStatus getStatus() {
+        return status;
+    }
+
+    public User getStudent() {
+        return student;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public SchoolClass getSchoolClass() {
+        return schoolClass;
+    }
+
+    public void setRegistrationDate(LocalDateTime registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
+    public void setStatus(RegistrationStatus status) {
+        this.status = status;
+    }
+
+    public void setStudent(User student) {
+        this.student = student;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public void setSchoolClass(SchoolClass schoolClass) {
+        this.schoolClass = schoolClass;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Registration that = (Registration) o;
+        return id != null ? id.equals(that.id) : that.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+}
 

@@ -142,11 +142,6 @@ public class UserService {
         log.info("Role {} assigned successfully to user ID: {}", name, userId);
         return updatedUser;
     }
-
-    public List<User> findByNameOrSurname(String keyword) {
-        log.debug("Searching users by name or surname containing: {}", keyword);
-        return userRepository.findByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(keyword, keyword);
-    }
     
     public List<User> findByRole(ERole role) {
         log.debug("Finding users with role: {}", role);
@@ -160,7 +155,7 @@ public class UserService {
     
     public List<User> findTeachersBySchoolClass(SchoolClass schoolClass) {
         log.debug("Finding teachers in school class: {}", schoolClass.getId());
-        return userRepository.findTeachersBySchoolClass(schoolClass);
+        return userRepository.findTeachersBySchoolClass(schoolClass.getId());
     }
     
     public List<User> findStudentsWithoutActiveRegistrations() {
