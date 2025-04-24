@@ -8,17 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.SchoolClassNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ActiveRegistrationsException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.MinimumTeachersException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.SchoolClassFullException;
 import com.riccardo.giangiulio.gestionescuola.model.Course;
 import com.riccardo.giangiulio.gestionescuola.model.Registration;
 import com.riccardo.giangiulio.gestionescuola.model.RegistrationStatus;
 import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.SchoolClassRepository;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.SchoolClassNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ActiveRegistrationsException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.MinimumTeachersException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.SchoolClassFullException;
 
 @Service
 public class SchoolClassService {
@@ -236,7 +236,7 @@ public class SchoolClassService {
         
         if (schoolClass.getTeachers() == null || schoolClass.getTeachers().isEmpty()) {
             log.error("School class must have at least one teacher");
-            throw new MinimumTeachersException(schoolClass.getId() != null ? schoolClass.getId() : 0L);
+            throw new MinimumTeachersException(schoolClass.getId());
         }
         
         schoolClass.getTeachers().forEach(teacher -> {

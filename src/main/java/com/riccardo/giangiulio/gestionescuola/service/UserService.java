@@ -9,16 +9,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.RoleNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.UserNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.EmailAlreadyExistException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidPasswordException;
 import com.riccardo.giangiulio.gestionescuola.model.ERole;
 import com.riccardo.giangiulio.gestionescuola.model.Role;
 import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.RoleRepository;
 import com.riccardo.giangiulio.gestionescuola.repository.UserRepository;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.RoleNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.UserNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.EmailAlreadyExistException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidPasswordException;
 
 @Service
 public class UserService {

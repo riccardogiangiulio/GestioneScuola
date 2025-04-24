@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "(SELECT DISTINCT reg.student.id FROM Registration reg WHERE reg.schoolClass = :schoolClass AND reg.status = 'ACTIVE')")
     List<User> findStudentsBySchoolClass(@Param("schoolClass") SchoolClass schoolClass);
     
-    @Query(value = "SELECT u.* FROM users u JOIN school_class_teacher sct ON u.id = sct.teacher_id WHERE sct.school_class_id = :schoolClassId", nativeQuery = true)
+    @Query(value = "SELECT u.* FROM users u JOIN class_teacher ct ON u.id = ct.teacher_id WHERE ct.class_id = :schoolClassId", nativeQuery = true)
     List<User> findTeachersBySchoolClass(@Param("schoolClassId") Long schoolClassId);
     
     @Query("SELECT u FROM User u WHERE u.role.name = 'ROLE_STUDENT' AND u.id NOT IN " +

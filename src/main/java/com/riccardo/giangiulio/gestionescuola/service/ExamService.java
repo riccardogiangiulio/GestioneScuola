@@ -9,6 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.ExamNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomCapacityExceededException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomNotAvailableException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidExamDataException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
 import com.riccardo.giangiulio.gestionescuola.model.Classroom;
 import com.riccardo.giangiulio.gestionescuola.model.Course;
 import com.riccardo.giangiulio.gestionescuola.model.Exam;
@@ -16,12 +22,6 @@ import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.Subject;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.ExamRepository;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.ExamNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomCapacityExceededException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.ClassroomNotAvailableException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidExamDataException;
 
 @Service
 public class ExamService {
@@ -182,10 +182,7 @@ public class ExamService {
             throw new InvalidTimeRangeException(start, end);
         }
         
-        return examRepository.findAll().stream()
-                .filter(exam -> !exam.getDate().isBefore(start) && !exam.getDate().isAfter(end))
-                .sorted((e1, e2) -> e1.getDate().compareTo(e2.getDate()))
-                .toList();
+        return examRepository.findByDateBetween(start, end);
     }
     
     public List<Exam> findByDateBetween(LocalDateTime start, LocalDateTime end) {
@@ -194,10 +191,7 @@ public class ExamService {
     
     public List<Exam> findUpcomingExams() {
         log.debug("Finding upcoming exams");
-        List<Exam> exams = examRepository.findAll().stream()
-                .filter(exam -> exam.getDate().isAfter(LocalDateTime.now()))
-                .sorted((e1, e2) -> e1.getDate().compareTo(e2.getDate()))
-                .toList();
+        List<Exam> exams = examRepository.findByDateAfter(LocalDateTime.now());
         if (exams.isEmpty()) {
             log.warn("No upcoming exams found");
         }
@@ -206,10 +200,7 @@ public class ExamService {
     
     public List<Exam> findPastExams() {
         log.debug("Finding past exams");
-        List<Exam> exams = examRepository.findAll().stream()
-                .filter(exam -> exam.getDate().isBefore(LocalDateTime.now()))
-                .sorted((e1, e2) -> e2.getDate().compareTo(e1.getDate()))
-                .toList();
+        List<Exam> exams = examRepository.findByDateBefore(LocalDateTime.now());
         if (exams.isEmpty()) {
             log.warn("No past exams found");
         }
@@ -235,23 +226,46 @@ public class ExamService {
             throw new InvalidExamDataException("Il punteggio di sufficienza deve essere compreso tra 0 e il punteggio massimo");
         }
         
-        // Controlli che richiedono integrazione con altri servizi
-        Classroom classroom = classroomService.findById(exam.getClassroom().getId());
-        SchoolClass schoolClass = schoolClassService.findById(exam.getSchoolClass().getId());
-        
-        // Verifica capienza aula
-        if (!classroomService.hasSufficientCapacity(classroom.getId(), schoolClass.getRegistrations().size())) {
-            log.warn("Classroom {} has insufficient capacity for school class {}", 
-                classroom.getId(), schoolClass.getId());
-            throw new ClassroomCapacityExceededException(classroom.getId(), classroom.getCapacity(), 
-                schoolClass.getRegistrations().size());
+        // Verifica che l'insegnante sia valido
+        if (exam.getTeacher() == null || exam.getTeacher().getId() == null) {
+            log.error("Teacher is null or has null ID");
+            throw new InvalidTeacherException(null);
         }
         
-        // Verifica che l'insegnante sia valido
         User teacher = userService.findById(exam.getTeacher().getId());
         if (!userService.isTeacher(teacher)) {
             log.error("User {} is not a teacher", teacher.getId());
             throw new InvalidTeacherException(teacher.getId());
+        }
+        
+        // Verifica classroom e schoolClass
+        if (exam.getClassroom() == null || exam.getClassroom().getId() == null) {
+            log.error("Classroom is null or has null ID");
+            throw new InvalidExamDataException("L'aula non può essere nulla");
+        }
+        
+        if (exam.getSchoolClass() == null || exam.getSchoolClass().getId() == null) {
+            log.error("SchoolClass is null or has null ID");
+            throw new InvalidExamDataException("La classe scolastica non può essere nulla");
+        }
+        
+        Classroom classroom = classroomService.findById(exam.getClassroom().getId());
+        SchoolClass schoolClass = schoolClassService.findById(exam.getSchoolClass().getId());
+        
+        // Verifica che l'aula abbia una capacità valida
+        if (classroom.getCapacity() <= 0) {
+            log.error("Classroom {} has invalid capacity: {}", classroom.getId(), classroom.getCapacity());
+            throw new InvalidExamDataException("L'aula deve avere una capacità positiva");
+        }
+        
+        // Verifica capienza aula
+        int registrationsCount = schoolClass.getRegistrations() != null ? 
+                                schoolClass.getRegistrations().size() : 0;
+        if (registrationsCount > 0 && !classroomService.hasSufficientCapacity(classroom.getId(), registrationsCount)) {
+            log.warn("Classroom {} has insufficient capacity for school class {}", 
+                classroom.getId(), schoolClass.getId());
+            throw new ClassroomCapacityExceededException(classroom.getId(), classroom.getCapacity(), 
+                registrationsCount);
         }
         
         // Verifica disponibilità aula per l'esame

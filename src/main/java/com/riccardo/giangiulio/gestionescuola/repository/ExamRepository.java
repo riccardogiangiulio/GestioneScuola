@@ -33,4 +33,10 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
     
     @Query("SELECT DISTINCT e FROM Exam e JOIN e.courses c WHERE c IN :courses")
     List<Exam> findByAnyCourseIn(@Param("courses") List<Course> courses);
+
+    List<Exam> findByDateBetween(LocalDateTime start, LocalDateTime end);
+
+    List<Exam> findByDateAfter(LocalDateTime date);
+
+    List<Exam> findByDateBefore(LocalDateTime date);
 }

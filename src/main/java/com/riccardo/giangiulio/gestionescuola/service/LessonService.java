@@ -151,6 +151,8 @@ public class LessonService {
         }
 
         Lesson existingLesson = existingLessonOptional.get();
+        existingLesson.setTitle(lesson.getTitle());
+        existingLesson.setDescription(lesson.getDescription());
         existingLesson.setStartDateTime(lesson.getStartDateTime());
         existingLesson.setEndDateTime(lesson.getEndDateTime());
         existingLesson.setClassroom(lesson.getClassroom());
@@ -207,11 +209,20 @@ public class LessonService {
         // Verifica che la materia esista
         subjectService.findById(lesson.getSubject().getId());
         
-        // Verifica che l'aula sia disponibile nel periodo richiesto
-        if (!classroomService.isAvailableForTimeSlot(
-            lesson.getClassroom().getId(), 
-            lesson.getStartDateTime(), 
-            lesson.getEndDateTime())) {
+        List<Lesson> conflictingLessons = lessonRepository.findByStartDateTimeBetween(
+            lesson.getStartDateTime().minusHours(24), // Marge di sicurezza per prendere tutte le possibili sovrapposizioni 
+            lesson.getEndDateTime().plusHours(24)     // Marge di sicurezza per prendere tutte le possibili sovrapposizioni
+        );
+        
+        // Filtra le lezioni per trovare quelle che si sovrappongono nel periodo richiesto
+        // ed esclude la lezione stessa se ha già un ID (aggiornamento)
+        boolean isNotAvailable = conflictingLessons.stream()
+            .filter(l -> l.getClassroom().getId().equals(lesson.getClassroom().getId())) // Solo per l'aula richiesta
+            .filter(l -> (l.getStartDateTime().isBefore(lesson.getEndDateTime()) && 
+                         l.getEndDateTime().isAfter(lesson.getStartDateTime()))) // Controllo sovrapposizione
+            .anyMatch(l -> !l.getId().equals(lesson.getId())); // Esclude la lezione stessa
+        
+        if (isNotAvailable) {
             log.warn("Classroom {} is not available in the specified time slot", lesson.getClassroom().getId());
             throw new ClassroomNotAvailableException(lesson.getClassroom().getId(), 
                 lesson.getStartDateTime(), lesson.getEndDateTime());

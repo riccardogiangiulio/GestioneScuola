@@ -16,7 +16,8 @@ public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
     List<Classroom> findByCapacityGreaterThanEqual(Integer minCapacity);
     
     @Query("SELECT c FROM Classroom c WHERE c.id NOT IN " +
-           "(SELECT DISTINCT l.classroom.id FROM Lesson l WHERE l.startDateTime BETWEEN :start AND :end)")
+           "(SELECT DISTINCT l.classroom.id FROM Lesson l WHERE " +
+           "(l.startDateTime <= :end AND l.endDateTime >= :start))")
     List<Classroom> findAvailableClassroomsInTimeRange(
             @Param("start") LocalDateTime start, 
             @Param("end") LocalDateTime end);
