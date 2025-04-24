@@ -52,11 +52,12 @@ public class SchoolClass {
     
     }   
 
-    public SchoolClass(String name, Course course, Integer maxStudents, Set<User> teachers) {
+    public SchoolClass(String name, Course course, Integer maxStudents, Set<User> teachers, Set<Registration> registrations) {
         this.name = name;
         this.course = course;
         this.maxStudents = maxStudents;
         this.teachers = teachers;
+        this.registrations = registrations;
     }
 
     public Long getId() {
