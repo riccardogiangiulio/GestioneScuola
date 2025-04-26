@@ -82,6 +82,8 @@ public class DataLoaderRunner implements CommandLineRunner {
             System.out.println("I dati sono già stati caricati.");
             return;
         }
+        // In DataLoaderRunner, aggiungi all'inizio del metodo run:
+        System.out.println("DATA LOADER - PasswordEncoder class: " + passwordEncoder.getClass().getName()); 
         
         System.out.println("Caricamento dati di test...");
         
@@ -98,7 +100,8 @@ public class DataLoaderRunner implements CommandLineRunner {
         User admin = new User(
             "Admin", 
             "User", 
-            "admin@scuola.it", 
+            "admin@scuola.it",
+            "admin",
             passwordEncoder.encode("password"), 
             LocalDate.of(1980, 1, 1), 
             adminRole
@@ -107,7 +110,8 @@ public class DataLoaderRunner implements CommandLineRunner {
         User teacher1 = new User(
             "Mario", 
             "Rossi", 
-            "mario.rossi@scuola.it", 
+            "mario.rossi@scuola.it",
+            "mario.rossi",
             passwordEncoder.encode("password"), 
             LocalDate.of(1975, 5, 15), 
             teacherRole
@@ -116,7 +120,8 @@ public class DataLoaderRunner implements CommandLineRunner {
         User teacher2 = new User(
             "Giulia", 
             "Bianchi", 
-            "giulia.bianchi@scuola.it", 
+            "giulia.bianchi@scuola.it",
+            "giulia.bianchi",
             passwordEncoder.encode("password"), 
             LocalDate.of(1980, 8, 20), 
             teacherRole
@@ -125,7 +130,8 @@ public class DataLoaderRunner implements CommandLineRunner {
         User student1 = new User(
             "Marco", 
             "Verdi", 
-            "marco.verdi@scuola.it", 
+            "marco.verdi@scuola.it",
+            "marco.verdi",
             passwordEncoder.encode("password"), 
             LocalDate.of(2000, 3, 10), 
             studentRole
@@ -134,7 +140,8 @@ public class DataLoaderRunner implements CommandLineRunner {
         User student2 = new User(
             "Laura", 
             "Neri", 
-            "laura.neri@scuola.it", 
+            "laura.neri@scuola.it",
+            "laura.neri",
             passwordEncoder.encode("password"), 
             LocalDate.of(2001, 7, 5), 
             studentRole
@@ -143,7 +150,8 @@ public class DataLoaderRunner implements CommandLineRunner {
         User student3 = new User(
             "Paolo", 
             "Gialli", 
-            "paolo.gialli@scuola.it", 
+            "paolo.gialli@scuola.it",
+            "paolo.gialli",
             passwordEncoder.encode("password"), 
             LocalDate.of(1999, 12, 30), 
             studentRole
@@ -152,7 +160,8 @@ public class DataLoaderRunner implements CommandLineRunner {
         User student4 = new User(
             "Elena", 
             "Marroni", 
-            "elena.marroni@scuola.it", 
+            "elena.marroni@scuola.it",
+            "elena.marroni",
             passwordEncoder.encode("password"), 
             LocalDate.of(2002, 5, 15), 
             studentRole
@@ -161,7 +170,8 @@ public class DataLoaderRunner implements CommandLineRunner {
         User student5 = new User(
             "Luca", 
             "Blu", 
-            "luca.blu@scuola.it", 
+            "luca.blu@scuola.it",
+            "luca.blu",
             passwordEncoder.encode("password"), 
             LocalDate.of(2001, 9, 20), 
             studentRole
@@ -170,7 +180,8 @@ public class DataLoaderRunner implements CommandLineRunner {
         User student6 = new User(
             "Sara", 
             "Viola", 
-            "sara.viola@scuola.it", 
+            "sara.viola@scuola.it",
+            "sara.viola",
             passwordEncoder.encode("password"), 
             LocalDate.of(2000, 11, 5), 
             studentRole

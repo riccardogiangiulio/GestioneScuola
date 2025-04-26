@@ -72,6 +72,11 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
+    public Boolean existsByUsername(String username) {
+        log.debug("Checking if user exists with username: {}", username);
+        return userRepository.existsByUsername(username);
+    }
+
     public User save(User user) {
         log.info("Saving new user with email: {}", user.getEmail());
         if (existsByEmail(user.getEmail())) {

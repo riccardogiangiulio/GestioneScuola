@@ -45,15 +45,20 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @NotBlank(message = "Lo username non può essere vuoto")
+    @Column(unique = true, nullable = false)
+    private String username;
+
     // Costruttore vuoto
     public User() {
     }
 
     // Costruttore con parametri
-    public User(String firstName, String lastName, String email, String password, LocalDate birthDate, Role role) {
+    public User(String firstName, String lastName, String email, String username, String password, LocalDate birthDate, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.username = username;
         this.password = password;
         this.birthDate = birthDate;
         this.role = role;
@@ -110,6 +115,14 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override

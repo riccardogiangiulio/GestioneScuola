@@ -30,4 +30,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.role.name = 'ROLE_STUDENT' AND u.id NOT IN " +
            "(SELECT DISTINCT reg.student.id FROM Registration reg WHERE reg.status = 'ACTIVE')")
     List<User> findStudentsWithoutActiveRegistrations();
+
+    Optional<User> findByUsername(String username);
+    
+    Boolean existsByUsername(String username);
 }
