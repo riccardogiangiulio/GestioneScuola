@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    image: gestionescuola
+    container_name: gestionescuola
+    build: .
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/gestione-scuola
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=RikoDev04
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    restart: always
+
+  db:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    environment:
+      - POSTGRES_DB=gestione-scuola
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=RikoDev04
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
