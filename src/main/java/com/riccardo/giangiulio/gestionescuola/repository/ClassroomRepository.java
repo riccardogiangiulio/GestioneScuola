@@ -2,6 +2,7 @@ package com.riccardo.giangiulio.gestionescuola.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +12,7 @@ import com.riccardo.giangiulio.gestionescuola.model.Classroom;
 
 public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
     
-    List<Classroom> findByName(String name);
+    Optional<Classroom> findByName(String name);
     
     List<Classroom> findByCapacityGreaterThanEqual(Integer minCapacity);
     

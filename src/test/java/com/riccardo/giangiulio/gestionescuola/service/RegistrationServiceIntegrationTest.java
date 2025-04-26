@@ -257,11 +257,10 @@ public class RegistrationServiceIntegrationTest {
     
     @Test
     public void testFindActiveByStudent() {
-        List<Registration> registrations = registrationService.findActiveByStudent(studentUser);
+        Registration registration = registrationService.findActiveByStudent(studentUser);
         
-        assertNotNull(registrations);
-        assertFalse(registrations.isEmpty());
-        assertTrue(registrations.stream().anyMatch(r -> r.getId().equals(testRegistration.getId())));
+        assertNotNull(registration);
+        assertEquals(testRegistration.getId(), registration.getId());
     }
     
     @Test

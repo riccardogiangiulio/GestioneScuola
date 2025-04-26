@@ -20,7 +20,7 @@ public class AttendanceDTO {
 
     public AttendanceDTO(Long id, Boolean present, LocalDateTime entryTime, LocalDateTime exitTime, UserDTO student, LessonSimpleDTO lesson) {
         this.id = id;
-        this.present = true;
+        this.present = present;
         this.entryTime = entryTime;
         this.exitTime = exitTime;
         this.student = student;

@@ -216,9 +216,10 @@ public class SchoolClassServiceIntegrationTest {
         invalidClass.setCourse(testCourse);
         invalidClass.setTeachers(teachers);
         
-        assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             schoolClassService.save(invalidClass);
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
@@ -229,9 +230,10 @@ public class SchoolClassServiceIntegrationTest {
         invalidClass.setCourse(testCourse);
         invalidClass.setTeachers(new HashSet<>()); // Nessun docente
         
-        assertThrows(MinimumTeachersException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             schoolClassService.save(invalidClass);
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
@@ -245,9 +247,10 @@ public class SchoolClassServiceIntegrationTest {
         invalidClass.setCourse(testCourse);
         invalidClass.setTeachers(invalidTeachers);
         
-        assertThrows(InvalidTeacherException.class, () -> {
+        InvalidTeacherException exception = assertThrows(InvalidTeacherException.class, () -> {
             schoolClassService.save(invalidClass);
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
@@ -279,9 +282,10 @@ public class SchoolClassServiceIntegrationTest {
         updateData.setCourse(testCourse);
         updateData.setTeachers(testClass.getTeachers());
         
-        assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             schoolClassService.update(testClass.getId(), updateData);
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
@@ -292,9 +296,10 @@ public class SchoolClassServiceIntegrationTest {
         updateData.setCourse(testCourse);
         updateData.setTeachers(new HashSet<>()); // Nessun docente
         
-        assertThrows(MinimumTeachersException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             schoolClassService.update(testClass.getId(), updateData);
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
@@ -308,9 +313,10 @@ public class SchoolClassServiceIntegrationTest {
         updateData.setCourse(testCourse);
         updateData.setTeachers(invalidTeachers);
         
-        assertThrows(InvalidTeacherException.class, () -> {
+        InvalidTeacherException exception = assertThrows(InvalidTeacherException.class, () -> {
             schoolClassService.update(testClass.getId(), updateData);
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
@@ -332,17 +338,19 @@ public class SchoolClassServiceIntegrationTest {
         schoolClassService.deleteById(idToDelete);
         
         // Verifico che sia stata eliminata
-        assertThrows(SchoolClassNotFoundException.class, () -> {
+        SchoolClassNotFoundException exception = assertThrows(SchoolClassNotFoundException.class, () -> {
             schoolClassService.findById(idToDelete);
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
     public void testDeleteByIdWithActiveRegistrations() {
         // La classe di test ha registrazioni attive
-        assertThrows(ActiveRegistrationsException.class, () -> {
+        ActiveRegistrationsException exception = assertThrows(ActiveRegistrationsException.class, () -> {
             schoolClassService.deleteById(testClass.getId());
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
@@ -365,11 +373,10 @@ public class SchoolClassServiceIntegrationTest {
     
     @Test
     public void testFindByName() {
-        List<SchoolClass> classes = schoolClassService.findByName(testClass.getName());
+        SchoolClass classes = schoolClassService.findByName(testClass.getName());
         
         assertNotNull(classes);
-        assertFalse(classes.isEmpty());
-        assertTrue(classes.stream().anyMatch(c -> c.getId().equals(testClass.getId())));
+        assertTrue(classes.getId().equals(testClass.getId()));
     }
     
     @Test
@@ -437,9 +444,10 @@ public class SchoolClassServiceIntegrationTest {
     
     @Test
     public void testAddInvalidTeacher() {
-        assertThrows(InvalidTeacherException.class, () -> {
+        InvalidTeacherException exception = assertThrows(InvalidTeacherException.class, () -> {
             schoolClassService.addTeacher(testClass.getId(), studentUser.getId());
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
@@ -468,9 +476,10 @@ public class SchoolClassServiceIntegrationTest {
     @Test
     public void testRemoveTeacherMinimumException() {
         // La classe ha solo un docente, non si può rimuovere
-        assertThrows(MinimumTeachersException.class, () -> {
+        MinimumTeachersException exception = assertThrows(MinimumTeachersException.class, () -> {
             schoolClassService.removeTeacher(testClass.getId(), teacherUser.getId());
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test
@@ -519,9 +528,10 @@ public class SchoolClassServiceIntegrationTest {
         schoolClassService.save(fullClass);
         
         // Verifico che la classe sia piena
-        assertThrows(SchoolClassFullException.class, () -> {
+        SchoolClassFullException exception = assertThrows(SchoolClassFullException.class, () -> {
             schoolClassService.isFull(fullClass.getId());
         });
+        assertNotNull(exception.getMessage());
     }
     
     @Test

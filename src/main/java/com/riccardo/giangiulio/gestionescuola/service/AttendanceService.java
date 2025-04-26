@@ -8,15 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.AttendanceNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidStudentException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.TimeOutOfBoundsExceptions;
 import com.riccardo.giangiulio.gestionescuola.model.Attendance;
 import com.riccardo.giangiulio.gestionescuola.model.Lesson;
 import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.AttendanceRepository;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.AttendanceNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidStudentException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTimeRangeException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.TimeOutOfBoundsExceptions;
 
 @Service
 public class AttendanceService {
@@ -52,12 +52,26 @@ public class AttendanceService {
             });
     }
     
-    @Transactional
-    public Attendance save(Attendance attendance) {
+    public Attendance save(Attendance attendanceRequest) {
         log.debug("Saving attendance for lesson {} and student {}", 
-            attendance.getLesson().getId(), attendance.getStudent().getId());
+            attendanceRequest.getLesson().getId(), attendanceRequest.getStudent().getId());
+        
+        // Pre-carica lo studente completo
+        User student = userService.findById(attendanceRequest.getStudent().getId());
+        
+        // Pre-carica la lezione completa
+        Lesson lesson = lessonService.findById(attendanceRequest.getLesson().getId());
+        
+        // Crea una nuova Attendance con le entità complete
+        Attendance attendance = new Attendance();
+        attendance.setPresent(attendanceRequest.getPresent());
+        attendance.setEntryTime(attendanceRequest.getEntryTime());
+        attendance.setExitTime(attendanceRequest.getExitTime());
+        attendance.setLesson(lesson);
+        attendance.setStudent(student);
         
         validateAttendance(attendance);
+        
         Attendance savedAttendance = attendanceRepository.save(attendance);
         log.info("Attendance saved successfully with ID: {}", savedAttendance.getId());
         return savedAttendance;
@@ -68,9 +82,21 @@ public class AttendanceService {
         log.debug("Updating attendance with id: {}", id);
         Attendance existingAttendance = findById(id);
         
-        existingAttendance.setPresent(attendance.getPresent());
-        existingAttendance.setEntryTime(attendance.getEntryTime());
-        existingAttendance.setExitTime(attendance.getExitTime());
+        if (attendance.getPresent() != null) {
+            existingAttendance.setPresent(attendance.getPresent());
+        }
+        if (attendance.getEntryTime() != null) {
+            existingAttendance.setEntryTime(attendance.getEntryTime());
+        }
+        if (attendance.getExitTime() != null) {
+            existingAttendance.setExitTime(attendance.getExitTime());
+        }
+        if (attendance.getLesson() != null && attendance.getLesson().getId() != null) {
+            existingAttendance.setLesson(lessonService.findById(attendance.getLesson().getId()));
+        }
+        if (attendance.getStudent() != null && attendance.getStudent().getId() != null) {
+            existingAttendance.setStudent(userService.findById(attendance.getStudent().getId()));
+        }
         
         validateAttendance(existingAttendance);
         Attendance updatedAttendance = attendanceRepository.save(existingAttendance);
@@ -145,10 +171,13 @@ public class AttendanceService {
     }
     
     private void validateAttendance(Attendance attendance) {
-        // Verifica che l'utente sia uno studente
-        if (!userService.isStudent(attendance.getStudent())) {
-            log.error("Cannot save attendance: user {} is not a student", attendance.getStudent().getId());
-            throw new InvalidStudentException(attendance.getStudent().getId());
+        // Lo studente è già stato caricato dal controller, usa direttamente quello
+        User student = attendance.getStudent();
+        
+        // Ora controlla se è uno studente
+        if (!userService.isStudent(student)) {
+            log.error("Cannot save attendance: user {} is not a student", student.getId());
+            throw new InvalidStudentException(student.getId());
         }
         
         // Verifica che l'orario di uscita sia dopo l'orario di entrata
@@ -159,7 +188,7 @@ public class AttendanceService {
         }
         
         // Verifica che l'orario di entrata e uscita siano compatibili con l'orario della lezione
-        Lesson lesson = lessonService.findById(attendance.getLesson().getId());
+        Lesson lesson = attendance.getLesson(); // Usa la lezione già caricata
         if (attendance.getEntryTime().isBefore(lesson.getStartDateTime()) || 
             attendance.getExitTime().isAfter(lesson.getEndDateTime())) {
             log.error("Attendance times are outside lesson time range");

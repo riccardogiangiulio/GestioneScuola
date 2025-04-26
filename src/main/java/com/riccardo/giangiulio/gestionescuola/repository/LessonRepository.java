@@ -14,9 +14,7 @@ import com.riccardo.giangiulio.gestionescuola.model.Subject;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
-    
-    List<Lesson> findByTitle(String title);
-    
+        
     List<Lesson> findBySchoolClass(SchoolClass schoolClass);
     
     List<Lesson> findByTeacher(User teacher);

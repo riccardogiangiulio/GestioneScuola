@@ -1,5 +1,6 @@
 package com.riccardo.giangiulio.gestionescuola.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,15 +9,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.RegistrationNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.DuplicateRegistrationException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidStudentException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.SchoolClassFullException;
+import com.riccardo.giangiulio.gestionescuola.model.Course;
 import com.riccardo.giangiulio.gestionescuola.model.Registration;
 import com.riccardo.giangiulio.gestionescuola.model.RegistrationStatus;
 import com.riccardo.giangiulio.gestionescuola.model.SchoolClass;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.RegistrationRepository;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.RegistrationNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.DuplicateRegistrationException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidStudentException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.SchoolClassFullException;
 
 @Service
 public class RegistrationService {
@@ -26,15 +29,18 @@ public class RegistrationService {
     private final RegistrationRepository registrationRepository;
     private final UserService userService;
     private final SchoolClassService schoolClassService;
+    private final CourseService courseService;
     
     @Autowired
     public RegistrationService(
             RegistrationRepository registrationRepository,
             UserService userService,
-            SchoolClassService schoolClassService) {
+            SchoolClassService schoolClassService,
+            CourseService courseService) {
         this.registrationRepository = registrationRepository;
         this.userService = userService;
         this.schoolClassService = schoolClassService;
+        this.courseService = courseService;
         log.info("RegistrationService initialized");
     }
     
@@ -52,10 +58,20 @@ public class RegistrationService {
             });
     }
     
-    public Registration save(Registration registration) {
+    public Registration save(Registration registrationRequest) {
         log.debug("Saving registration for student {} and school class {}", 
-            registration.getStudent().getId(), registration.getSchoolClass().getId());
-        
+            registrationRequest.getStudent().getId(), registrationRequest.getSchoolClass().getId());
+
+        User student = userService.findById(registrationRequest.getStudent().getId());
+        SchoolClass schoolClass = schoolClassService.findById(registrationRequest.getSchoolClass().getId());
+        Course course = courseService.findById(registrationRequest.getCourse().getId());
+
+        Registration registration = new Registration();
+        registration.setRegistrationDate(LocalDateTime.now());
+        registration.setStatus(registrationRequest.getStatus());
+        registration.setStudent(student);
+        registration.setSchoolClass(schoolClass);
+        registration.setCourse(course);
         validateRegistration(registration);
         Registration savedRegistration = registrationRepository.save(registration);
         log.info("Registration saved successfully with ID: {}", savedRegistration.getId());
@@ -65,10 +81,30 @@ public class RegistrationService {
     @Transactional
     public Registration update(Long id, Registration registration) {
         log.debug("Updating registration with id: {}", id);
-        Registration existingRegistration = findById(id);
+        Optional<Registration> existingRegistrationOptional = registrationRepository.findById(id);
         
-        existingRegistration.setStatus(registration.getStatus());
-        existingRegistration.setSchoolClass(registration.getSchoolClass());
+        if (!existingRegistrationOptional.isPresent()) {
+            log.error("Registration not found with ID: {}", id);
+            throw new RegistrationNotFoundException(id);
+        }
+
+        Registration existingRegistration = existingRegistrationOptional.get();
+
+        if (registration.getRegistrationDate() != null) {
+            existingRegistration.setRegistrationDate(registration.getRegistrationDate());
+        }
+        if (registration.getStatus() != null ) {
+            existingRegistration.setStatus(registration.getStatus());
+        }
+        if (registration.getSchoolClass() != null) {
+            existingRegistration.setSchoolClass(registration.getSchoolClass());
+        }
+        if (registration.getCourse() != null) {
+            existingRegistration.setCourse(registration.getCourse());
+        }
+        if (registration.getStudent() != null) {
+            existingRegistration.setStudent(registration.getStudent());
+        }
         
         validateRegistration(existingRegistration);
         Registration updatedRegistration = registrationRepository.save(existingRegistration);
@@ -137,13 +173,14 @@ public class RegistrationService {
         return registrations;
     }
     
-    public List<Registration> findActiveByStudent(User student) {
+    public Registration findActiveByStudent(User student) {
         log.debug("Finding active registrations for student id: {}", student.getId());
-        List<Registration> registrations = registrationRepository.findActiveByStudent(student);
-        if (registrations.isEmpty()) {
-            log.warn("No active registrations found for student ID: {}", student.getId());
-        }
-        return registrations;
+        Registration registration = registrationRepository.findActiveByStudent(student)
+            .orElseThrow(() -> {
+                log.warn("No active registrations found for student ID: {}", student.getId());
+                return new RegistrationNotFoundException(student.getId());
+            });
+        return registration;
     }
     
     public List<Registration> findActiveBySchoolClass(SchoolClass schoolClass) {

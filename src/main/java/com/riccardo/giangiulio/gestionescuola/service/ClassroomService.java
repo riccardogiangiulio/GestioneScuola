@@ -2,11 +2,11 @@ package com.riccardo.giangiulio.gestionescuola.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,7 @@ public class ClassroomService {
     private final SchoolClassService schoolClassService;
     
     @Autowired
-    public ClassroomService(ClassroomRepository classroomRepository, SchoolClassService schoolClassService) {
+    public ClassroomService(ClassroomRepository classroomRepository, @Lazy SchoolClassService schoolClassService) {
         this.classroomRepository = classroomRepository;
         this.schoolClassService = schoolClassService;
         log.info("ClassroomService initialized");
@@ -61,22 +61,20 @@ public class ClassroomService {
     @Transactional
     public Classroom update(Long id, Classroom classroom) {
         log.info("Updating classroom with id: {}", id);
-        Optional<Classroom> existingClassroomOptional = classroomRepository.findById(id);
+        Classroom existingClassroom = findById(id);
 
-        if (!existingClassroomOptional.isPresent()) {
-            log.error("Failed to update classroom: Not found with ID: {}", id);
-            throw new ClassroomNotFoundException(id);
+        // Aggiorna solo i campi non nulli
+        if (classroom.getName() != null && !classroom.getName().isEmpty()) {
+            existingClassroom.setName(classroom.getName());
+        }  
+        if (classroom.getCapacity() != null) {
+            // Verifica che la capacità sia valida
+            if (classroom.getCapacity() <= 0) {
+                log.error("Failed to update classroom: Invalid capacity {}", classroom.getCapacity());
+                throw new ClassroomCapacityExceededException(id, 0, classroom.getCapacity());
+            }
+            existingClassroom.setCapacity(classroom.getCapacity());
         }
-
-        Classroom existingClassroom = existingClassroomOptional.get();
-        existingClassroom.setName(classroom.getName());
-        existingClassroom.setCapacity(classroom.getCapacity());
-        
-        if (classroom.getCapacity() <= 0) {
-            log.error("Failed to update classroom: Invalid capacity {}", classroom.getCapacity());
-            throw new ClassroomCapacityExceededException(id, 0, classroom.getCapacity());
-        }
-        
         Classroom updatedClassroom = classroomRepository.save(existingClassroom);
         log.info("Classroom updated successfully with ID: {}", id);
         return updatedClassroom;
@@ -93,15 +91,13 @@ public class ClassroomService {
         log.info("Classroom deleted successfully with ID: {}", id);
     }
     
-    public List<Classroom> findByName(String name) {
+    public Classroom findByName(String name) {
         log.debug("Finding classrooms by name: {}", name);
-        List<Classroom> classrooms = classroomRepository.findByName(name);
-        if (classrooms.isEmpty()) {
-            log.warn("No classrooms found with name: {}", name);
-        } else {
-            log.info("Found {} classrooms with name: {}", classrooms.size(), name);
-        }
-        return classrooms;
+        return classroomRepository.findByName(name)
+            .orElseThrow(() -> {
+                log.error("Classroom not found with name: {}", name);
+            return new ClassroomNotFoundException(name);
+        });
     }
     
     public List<Classroom> findByMinCapacity(Integer minCapacity) {

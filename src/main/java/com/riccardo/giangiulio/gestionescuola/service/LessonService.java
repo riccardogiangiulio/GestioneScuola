@@ -130,10 +130,24 @@ public class LessonService {
     }
 
     @Transactional
-    public Lesson save(Lesson lesson) {
+    public Lesson save(Lesson lessonRequest) {
         log.debug("Saving lesson for subject {} and teacher {}", 
-            lesson.getSubject().getId(), lesson.getTeacher().getId());
+            lessonRequest.getSubject().getId(), lessonRequest.getTeacher().getId());
+        User teacher = userService.findById(lessonRequest.getTeacher().getId());
+        Classroom classroom = classroomService.findById(lessonRequest.getClassroom().getId());
+        SchoolClass schoolClass = schoolClassService.findById(lessonRequest.getSchoolClass().getId());
+        Subject subject = subjectService.findById(lessonRequest.getSubject().getId());
         
+        Lesson lesson = new Lesson();
+        lesson.setStartDateTime(lessonRequest.getStartDateTime());
+        lesson.setEndDateTime(lessonRequest.getEndDateTime());
+        lesson.setTitle(lessonRequest.getTitle());
+        lesson.setDescription(lessonRequest.getDescription());
+        lesson.setTeacher(teacher);
+        lesson.setClassroom(classroom);
+        lesson.setSchoolClass(schoolClass);
+        lesson.setSubject(subject);
+
         validateLesson(lesson);
         Lesson savedLesson = lessonRepository.save(lesson);
         log.info("Lesson saved successfully with ID: {}", savedLesson.getId());
@@ -151,14 +165,34 @@ public class LessonService {
         }
 
         Lesson existingLesson = existingLessonOptional.get();
-        existingLesson.setTitle(lesson.getTitle());
-        existingLesson.setDescription(lesson.getDescription());
-        existingLesson.setStartDateTime(lesson.getStartDateTime());
-        existingLesson.setEndDateTime(lesson.getEndDateTime());
-        existingLesson.setClassroom(lesson.getClassroom());
-        existingLesson.setTeacher(lesson.getTeacher());
-        existingLesson.setSchoolClass(lesson.getSchoolClass());
-        existingLesson.setSubject(lesson.getSubject());
+        if (lesson.getTitle() != null) {
+            existingLesson.setTitle(lesson.getTitle());
+        }
+        if (lesson.getDescription() != null) {
+            existingLesson.setDescription(lesson.getDescription());
+        }
+        if (lesson.getStartDateTime() != null) {
+            existingLesson.setStartDateTime(lesson.getStartDateTime());
+        }
+        if (lesson.getEndDateTime() != null) {
+            existingLesson.setEndDateTime(lesson.getEndDateTime());
+        }
+        if (lesson.getClassroom() != null && lesson.getClassroom().getId() != null) {
+            existingLesson.setClassroom(classroomService.findById(lesson.getClassroom().getId()));
+        }
+        
+        if (lesson.getTeacher() != null && lesson.getTeacher().getId() != null) {
+            existingLesson.setTeacher(userService.findById(lesson.getTeacher().getId()));
+        }
+        
+        if (lesson.getSchoolClass() != null && lesson.getSchoolClass().getId() != null) {
+            existingLesson.setSchoolClass(schoolClassService.findById(lesson.getSchoolClass().getId()));
+        }
+        
+        if (lesson.getSubject() != null && lesson.getSubject().getId() != null) {
+            existingLesson.setSubject(subjectService.findById(lesson.getSubject().getId()));
+        }
+
         
         validateLesson(existingLesson);
         Lesson updatedLesson = lessonRepository.save(existingLesson);

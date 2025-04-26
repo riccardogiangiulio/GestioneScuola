@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,17 +33,20 @@ public class ExamService {
     private final ClassroomService classroomService;
     private final SchoolClassService schoolClassService;
     private final UserService userService;
+    private final SubjectService subjectService;
     
     @Autowired
     public ExamService(
             ExamRepository examRepository,
             ClassroomService classroomService,
-            SchoolClassService schoolClassService,
-            UserService userService) {
+            @Lazy SchoolClassService schoolClassService,
+            UserService userService,
+            SubjectService subjectService) {
         this.examRepository = examRepository;
         this.classroomService = classroomService;
         this.schoolClassService = schoolClassService;
         this.userService = userService;
+        this.subjectService = subjectService;
         log.info("ExamService initialized");
     }
     
@@ -63,8 +67,25 @@ public class ExamService {
     }
     
     @Transactional
-    public Exam save(Exam exam) {
-        log.info("Saving exam: {}", exam.getTitle());
+    public Exam save(Exam examRequest) {
+        log.info("Saving exam: {}", examRequest.getTitle());
+        
+        User teacher = userService.findById(examRequest.getTeacher().getId());
+        Subject subject = subjectService.findById(examRequest.getSubject().getId());
+        Classroom classroom = classroomService.findById(examRequest.getClassroom().getId());
+        SchoolClass schoolClass = schoolClassService.findById(examRequest.getSchoolClass().getId());
+        
+        Exam exam = new Exam();
+        exam.setTitle(examRequest.getTitle());
+        exam.setDescription(examRequest.getDescription());
+        exam.setDate(examRequest.getDate());
+        exam.setDuration(examRequest.getDuration());
+        exam.setMaxScore(examRequest.getMaxScore());
+        exam.setPassingScore(examRequest.getPassingScore());
+        exam.setTeacher(teacher);
+        exam.setSubject(subject);
+        exam.setClassroom(classroom);
+        exam.setSchoolClass(schoolClass);
         
         validateExam(exam);
         
@@ -79,16 +100,36 @@ public class ExamService {
         
         Exam existingExam = findById(id);
         
-        existingExam.setTitle(exam.getTitle());
-        existingExam.setDescription(exam.getDescription());
-        existingExam.setDate(exam.getDate());
-        existingExam.setDuration(exam.getDuration());
-        existingExam.setMaxScore(exam.getMaxScore());
-        existingExam.setPassingScore(exam.getPassingScore());
-        existingExam.setClassroom(exam.getClassroom());
-        existingExam.setSubject(exam.getSubject());
-        existingExam.setSchoolClass(exam.getSchoolClass());
-        existingExam.setTeacher(exam.getTeacher());
+        if (exam.getTitle() != null) {
+            existingExam.setTitle(exam.getTitle());
+        }
+        if (exam.getDescription() != null) {
+            existingExam.setDescription(exam.getDescription());
+        }
+        if (exam.getDate() != null) {
+            existingExam.setDate(exam.getDate());
+        }
+        if (exam.getDuration() != null) {
+            existingExam.setDuration(exam.getDuration());
+        }
+        if (exam.getMaxScore() != null) {
+            existingExam.setMaxScore(exam.getMaxScore());
+        }
+        if (exam.getPassingScore() != null) {
+            existingExam.setPassingScore(exam.getPassingScore());
+        }
+        if (exam.getClassroom() != null && exam.getClassroom().getId() != null) {
+            existingExam.setClassroom(classroomService.findById(exam.getClassroom().getId()));
+        }
+        if (exam.getSubject() != null && exam.getSubject().getId() != null) {
+            existingExam.setSubject(subjectService.findById(exam.getSubject().getId()));
+        }
+        if (exam.getSchoolClass() != null && exam.getSchoolClass().getId() != null) {
+            existingExam.setSchoolClass(schoolClassService.findById(exam.getSchoolClass().getId()));
+        }
+        if (exam.getTeacher() != null && exam.getTeacher().getId() != null) {
+            existingExam.setTeacher(userService.findById(exam.getTeacher().getId()));
+        }
         
         validateExam(existingExam);
         
@@ -108,15 +149,13 @@ public class ExamService {
         log.info("Exam deleted successfully with ID: {}", id);
     }
     
-    public List<Exam> findByTitle(String title) {
+    public Exam findByTitle(String title) {
         log.debug("Finding exams by title: {}", title);
-        List<Exam> exams = examRepository.findByTitle(title);
-        if (exams.isEmpty()) {
+        Exam exam = examRepository.findByTitle(title).orElseThrow(() -> {
             log.warn("No exams found with title: {}", title);
-        } else {
-            log.info("Found {} exams with title: {}", exams.size(), title);
-        }
-        return exams;
+            return new ExamNotFoundException(title);
+        });
+        return exam;
     }
     
     public List<Exam> findByDate(LocalDateTime date) {

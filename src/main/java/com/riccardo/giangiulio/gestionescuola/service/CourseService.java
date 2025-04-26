@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.CourseNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.ExamNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.SubjectNotFoundException;
 import com.riccardo.giangiulio.gestionescuola.model.Course;
 import com.riccardo.giangiulio.gestionescuola.model.Exam;
 import com.riccardo.giangiulio.gestionescuola.model.Subject;
 import com.riccardo.giangiulio.gestionescuola.repository.CourseRepository;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.CourseNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.SubjectNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.ExamNotFoundException;
 
 @Service
 public class CourseService {
@@ -69,11 +69,24 @@ public class CourseService {
         }
 
         Course existingCourse = existingCourseOptional.get();
-        existingCourse.setTitle(course.getTitle());
-        existingCourse.setDescription(course.getDescription());
-        existingCourse.setDuration(course.getDuration());
-        existingCourse.setPrice(course.getPrice());
-
+        if (course.getTitle() != null && !course.getTitle().isEmpty()) {
+            existingCourse.setTitle(course.getTitle());
+        }
+        if (course.getDescription() != null && !course.getDescription().isEmpty()) {
+            existingCourse.setDescription(course.getDescription());
+        }
+        if (course.getDuration() != null && !course.getDuration().isEmpty()) {
+            existingCourse.setDuration(course.getDuration());
+        }
+        if (course.getPrice() != null) {
+            existingCourse.setPrice(course.getPrice());
+        }
+        if (course.getSubjects() != null && !course.getSubjects().isEmpty()) {
+            existingCourse.setSubjects(course.getSubjects());
+        }
+        if (course.getExams() != null && !course.getExams().isEmpty()) {
+            existingCourse.setExams(course.getExams());
+        }
         Course updatedCourse = courseRepository.save(existingCourse);
         log.info("Course updated successfully with ID: {}", id);
         return updatedCourse;

@@ -356,14 +356,13 @@ public class ClassroomServiceIntegrationTest {
     
     @Test
     public void testFindByName() {
-        List<Classroom> classrooms = classroomService.findByName("Classroom 101");
+        Classroom classrooms = classroomService.findByName("Classroom 101");
         
         assertNotNull(classrooms);
-        assertEquals(1, classrooms.size());
-        assertEquals(classroom1.getId(), classrooms.get(0).getId());
+        assertEquals(classroom1.getId(), classrooms.getId());
         
-        List<Classroom> nonExistentClassrooms = classroomService.findByName("Non Existent");
-        assertTrue(nonExistentClassrooms.isEmpty());
+        Classroom nonExistentClassrooms = classroomService.findByName("Non Existent");
+        assertNotNull(nonExistentClassrooms);
     }
     
     @Test

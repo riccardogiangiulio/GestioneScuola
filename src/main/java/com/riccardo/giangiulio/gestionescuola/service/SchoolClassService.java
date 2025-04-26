@@ -1,6 +1,8 @@
 package com.riccardo.giangiulio.gestionescuola.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +29,16 @@ public class SchoolClassService {
     
     private final SchoolClassRepository schoolClassRepository;
     private final UserService userService;
+    private final CourseService courseService;
     
     @Autowired
     public SchoolClassService(
             SchoolClassRepository schoolClassRepository,
-            UserService userService) {
+            UserService userService,
+            CourseService courseService) {
         this.schoolClassRepository = schoolClassRepository;
         this.userService = userService;
+        this.courseService = courseService;
         log.info("SchoolClassService initialized");
     }
     
@@ -53,8 +58,34 @@ public class SchoolClassService {
             });
     }
     
-    public SchoolClass save(SchoolClass schoolClass) {
-        log.info("Saving school class: {}", schoolClass.getName());
+    @Transactional
+    public SchoolClass save(SchoolClass schoolClassRequest) {
+        log.info("Saving school class: {}", schoolClassRequest.getName());
+
+        Course course = courseService.findById(schoolClassRequest.getCourse().getId());
+        
+        if (schoolClassRequest.getTeachers() == null || schoolClassRequest.getTeachers().isEmpty()) {
+            log.error("School class must have at least one teacher");
+            throw new MinimumTeachersException(null);
+        }
+        
+        // Ottieni il set di insegnanti verificati
+        Set<User> teachers = new HashSet<>();
+        for (User teacherRequest : schoolClassRequest.getTeachers()) {
+            User teacher = userService.findById(teacherRequest.getId());
+            if (!userService.isTeacher(teacher)) {
+                log.error("User {} is not a teacher", teacher.getId());
+                throw new InvalidTeacherException(teacher.getId());
+            }
+            teachers.add(teacher);
+        }
+
+        SchoolClass schoolClass = new SchoolClass();
+        schoolClass.setName(schoolClassRequest.getName());
+        schoolClass.setMaxStudents(schoolClassRequest.getMaxStudents());
+        schoolClass.setCourse(course);
+        schoolClass.setTeachers(teachers);
+
         validateSchoolClass(schoolClass);
         SchoolClass savedClass = schoolClassRepository.save(schoolClass);
         log.info("School class saved successfully with ID: {}", savedClass.getId());
@@ -62,33 +93,41 @@ public class SchoolClassService {
     }
     
     @Transactional
-    public SchoolClass update(Long id, SchoolClass schoolClass) {
+    public SchoolClass update(Long id, SchoolClass schoolClassRequest) {
         log.info("Updating school class with id: {}", id);
+        
         SchoolClass existingSchoolClass = findById(id);
         
-        existingSchoolClass.setName(schoolClass.getName());
-        if (schoolClass.getMaxStudents() != null) {
-            validateMaxStudents(schoolClass.getMaxStudents(), existingSchoolClass.getRegistrations().size());
-            existingSchoolClass.setMaxStudents(schoolClass.getMaxStudents());
+        if (schoolClassRequest.getName() != null) {
+            existingSchoolClass.setName(schoolClassRequest.getName());
         }
         
-        existingSchoolClass.setCourse(schoolClass.getCourse());
-        
-        // Validare che ci sia almeno un insegnante
-        if (schoolClass.getTeachers() == null || schoolClass.getTeachers().isEmpty()) {
-            log.error("School class must have at least one teacher");
-            throw new MinimumTeachersException(id);
+        if (schoolClassRequest.getMaxStudents() != null) {
+            validateMaxStudents(schoolClassRequest.getMaxStudents(), existingSchoolClass.getRegistrations().size());
+            existingSchoolClass.setMaxStudents(schoolClassRequest.getMaxStudents());
         }
         
-        // Validare che tutti gli utenti siano insegnanti
-        schoolClass.getTeachers().forEach(teacher -> {
-            if (!userService.isTeacher(teacher)) {
-                log.error("User {} is not a teacher", teacher.getId());
-                throw new InvalidTeacherException(teacher.getId());
+        // Aggiorna il corso se fornito
+        if (schoolClassRequest.getCourse() != null && schoolClassRequest.getCourse().getId() != null) {
+            Course course = courseService.findById(schoolClassRequest.getCourse().getId());
+            existingSchoolClass.setCourse(course);
+        }
+        
+        // Aggiorna gli insegnanti se forniti
+        if (schoolClassRequest.getTeachers() != null && !schoolClassRequest.getTeachers().isEmpty()) {
+            Set<User> teachers = new HashSet<>();
+            for (User teacherRequest : schoolClassRequest.getTeachers()) {
+                User teacher = userService.findById(teacherRequest.getId());
+                if (!userService.isTeacher(teacher)) {
+                    log.error("User {} is not a teacher", teacher.getId());
+                    throw new InvalidTeacherException(teacher.getId());
+                }
+                teachers.add(teacher);
             }
-        });
+            existingSchoolClass.setTeachers(teachers);
+        }
         
-        existingSchoolClass.setTeachers(schoolClass.getTeachers());
+        validateSchoolClass(existingSchoolClass);
         
         SchoolClass updatedClass = schoolClassRepository.save(existingSchoolClass);
         log.info("School class updated successfully with ID: {}", id);
@@ -131,15 +170,15 @@ public class SchoolClassService {
         return classes;
     }
     
-    public List<SchoolClass> findByName(String name) {
+    public SchoolClass findByName(String name) {
         log.debug("Finding school classes by name: {}", name);
-        List<SchoolClass> classes = schoolClassRepository.findByName(name);
-        if (classes.isEmpty()) {
-            log.warn("No school classes found with name: {}", name);
-        } else {
-            log.info("Found {} school classes with name: {}", classes.size(), name);
-        }
-        return classes;
+        SchoolClass schoolClass = schoolClassRepository.findByName(name)
+            .orElseThrow(() -> {
+                log.warn("No school classes found with name: {}", name);
+                return new SchoolClassNotFoundException(name);
+            });
+        log.info("Found school class with name: {}", name);
+        return schoolClass;
     }
     
     public List<SchoolClass> findAvailable() {
@@ -229,16 +268,14 @@ public class SchoolClassService {
     }
     
     private void validateSchoolClass(SchoolClass schoolClass) {
-        if (schoolClass.getMaxStudents() != null && schoolClass.getMaxStudents() <= 0) {
-            log.error("Invalid maximum number of students: {}", schoolClass.getMaxStudents());
-            throw new IllegalArgumentException("Maximum number of students must be greater than zero");
-        }
-        
+
+        // Validare che ci sia almeno un insegnante
         if (schoolClass.getTeachers() == null || schoolClass.getTeachers().isEmpty()) {
             log.error("School class must have at least one teacher");
             throw new MinimumTeachersException(schoolClass.getId());
         }
         
+        // Validare che tutti gli utenti siano insegnanti
         schoolClass.getTeachers().forEach(teacher -> {
             if (!userService.isTeacher(teacher)) {
                 log.error("User {} is not a teacher", teacher.getId());

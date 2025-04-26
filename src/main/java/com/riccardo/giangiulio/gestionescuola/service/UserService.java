@@ -44,11 +44,18 @@ public class UserService {
 
     public User findById(Long id) {
         log.debug("Finding user with id: {}", id);
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("User not found with ID: {}", id);
                     return new UserNotFoundException(id);
                 });
+        
+        // Forza l'inizializzazione del ruolo
+        if (user.getRole() != null) {
+            user.getRole().getName(); // Forza il caricamento
+        }
+        
+        return user;
     }
 
     public User findByEmail(String email) {
@@ -165,16 +172,16 @@ public class UserService {
 
     public boolean isTeacher(User user) {
         log.debug("Checking if user {} is a teacher", user.getId());
-        return user.getRole().getName() == ERole.ROLE_TEACHER;
+        return user.getRole() != null && user.getRole().getName() == ERole.ROLE_TEACHER;
     }
     
     public boolean isStudent(User user) {
         log.debug("Checking if user {} is a student", user.getId());
-        return user.getRole().getName() == ERole.ROLE_STUDENT;
+        return user.getRole() != null && user.getRole().getName() == ERole.ROLE_STUDENT;
     }
     
     public boolean isAdmin(User user) {
         log.debug("Checking if user {} is an admin", user.getId());
-        return user.getRole().getName() == ERole.ROLE_ADMIN;
+        return user.getRole() != null && user.getRole().getName() == ERole.ROLE_ADMIN;
     }
 }

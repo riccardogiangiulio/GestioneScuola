@@ -411,11 +411,10 @@ public class ExamServiceIntegrationTest {
     
     @Test
     public void testFindByTitle() {
-        List<Exam> exams = examService.findByTitle(testExam.getTitle());
+        Exam exam = examService.findByTitle(testExam.getTitle());
         
-        assertNotNull(exams);
-        assertFalse(exams.isEmpty());
-        assertTrue(exams.stream().anyMatch(e -> e.getId().equals(testExam.getId())));
+        assertNotNull(exam);
+        assertTrue(exam.getId().equals(testExam.getId()));
     }
     
     @Test

@@ -29,7 +29,7 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     List<Registration> findByCourseId(@Param("courseId") Long courseId);
     
     @Query("SELECT r FROM Registration r WHERE r.student = :student AND r.status = 'ACTIVE'")
-    List<Registration> findActiveByStudent(@Param("student") User student);
+    Optional<Registration> findActiveByStudent(@Param("student") User student);
     
     @Query("SELECT r FROM Registration r WHERE r.schoolClass = :schoolClass AND r.status = 'ACTIVE'")
     List<Registration> findActiveBySchoolClass(@Param("schoolClass") SchoolClass schoolClass);

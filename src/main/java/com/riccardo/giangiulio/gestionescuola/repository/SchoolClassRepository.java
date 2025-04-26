@@ -1,6 +1,7 @@
 package com.riccardo.giangiulio.gestionescuola.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +18,7 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass, Long> 
     @Query("SELECT sc FROM SchoolClass sc WHERE :teacher MEMBER OF sc.teachers")
     List<SchoolClass> findByTeacher(@Param("teacher") User teacher);
     
-    List<SchoolClass> findByName(String name);
+    Optional<SchoolClass> findByName(String name);
     
     @Query("SELECT sc FROM SchoolClass sc WHERE SIZE(sc.registrations) < sc.maxStudents")
     List<SchoolClass> findAvailableClasses();

@@ -1,18 +1,19 @@
 package com.riccardo.giangiulio.gestionescuola.service;
 
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.SubjectNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
 import com.riccardo.giangiulio.gestionescuola.model.Course;
 import com.riccardo.giangiulio.gestionescuola.model.Subject;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.SubjectRepository;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.SubjectNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidTeacherException;
 
 @Service
 public class SubjectService {
@@ -45,30 +46,50 @@ public class SubjectService {
             });
     }
     
-    public Subject save(Subject subject) {
-        log.info("Saving subject: {}", subject.getName());
-        if (userService.isTeacher(subject.getTeacher())) {
-            Subject savedSubject = subjectRepository.save(subject);
-            log.info("Subject saved successfully with ID: {}", savedSubject.getId());
-            return savedSubject;
+    @Transactional
+    public Subject save(Subject subjectRequest) {
+        log.info("Saving subject: {}", subjectRequest.getName());
+        
+        User teacher = userService.findById(subjectRequest.getTeacher().getId());
+        
+        if (!userService.isTeacher(teacher)) {
+            log.error("Failed to save subject: User {} is not a teacher", teacher.getId());
+            throw new InvalidTeacherException(teacher.getId());
         }
-        log.error("Failed to save subject: User {} is not a teacher", subject.getTeacher().getId());
-        throw new InvalidTeacherException(subject.getTeacher().getId());
+        
+        Subject subject = new Subject();
+        subject.setName(subjectRequest.getName());
+        subject.setDescription(subjectRequest.getDescription());
+        subject.setTeacher(teacher);
+        
+        Subject savedSubject = subjectRepository.save(subject);
+        log.info("Subject saved successfully with ID: {}", savedSubject.getId());
+        return savedSubject;
     }
     
     @Transactional
-    public Subject update(Long id, Subject subject) {
+    public Subject update(Long id, Subject subjectRequest) {
         log.info("Updating subject with id: {}", id);
+        
         Subject existingSubject = findById(id);
         
-        existingSubject.setName(subject.getName());
-        existingSubject.setDescription(subject.getDescription());
-        if (userService.isTeacher(subject.getTeacher())) {
-            existingSubject.setTeacher(subject.getTeacher());
+        if (subjectRequest.getName() != null) {
+            existingSubject.setName(subjectRequest.getName());
         }
-        else {
-            log.error("Failed to update subject: User {} is not a teacher", subject.getTeacher().getId());
-            throw new InvalidTeacherException(subject.getTeacher().getId());
+        
+        if (subjectRequest.getDescription() != null) {
+            existingSubject.setDescription(subjectRequest.getDescription());
+        }
+        
+        if (subjectRequest.getTeacher() != null && subjectRequest.getTeacher().getId() != null) {
+            User teacher = userService.findById(subjectRequest.getTeacher().getId());
+            
+            if (!userService.isTeacher(teacher)) {
+                log.error("Failed to update subject: User {} is not a teacher", teacher.getId());
+                throw new InvalidTeacherException(teacher.getId());
+            }
+            
+            existingSubject.setTeacher(teacher);
         }
         
         Subject updatedSubject = subjectRepository.save(existingSubject);

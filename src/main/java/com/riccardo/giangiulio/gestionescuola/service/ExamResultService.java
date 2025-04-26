@@ -1,19 +1,20 @@
 package com.riccardo.giangiulio.gestionescuola.service;
 
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.ExamResultNotFoundException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidExamDataException;
+import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidStudentException;
 import com.riccardo.giangiulio.gestionescuola.model.Exam;
 import com.riccardo.giangiulio.gestionescuola.model.ExamResult;
 import com.riccardo.giangiulio.gestionescuola.model.User;
 import com.riccardo.giangiulio.gestionescuola.repository.ExamResultRepository;
-import com.riccardo.giangiulio.gestionescuola.exception.NotFoundException.ExamResultNotFoundException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidStudentException;
-import com.riccardo.giangiulio.gestionescuola.exception.ValidationException.InvalidExamDataException;
 
 @Service
 public class ExamResultService {
@@ -22,13 +23,16 @@ public class ExamResultService {
     
     private final ExamResultRepository examResultRepository;
     private final UserService userService;
+    private final ExamService examService;
     
     @Autowired
     public ExamResultService(
             ExamResultRepository examResultRepository,
-            UserService userService) {
+            UserService userService,
+            ExamService examService) {
         this.examResultRepository = examResultRepository;
         this.userService = userService;
+        this.examService = examService;
         log.info("ExamResultService initialized");
     }
     
@@ -46,10 +50,23 @@ public class ExamResultService {
             });
     }
     
-    public ExamResult save(ExamResult examResult) {
+    public ExamResult save(ExamResult examResultRequest) {
         log.debug("Saving exam result for exam {} and student {}", 
-            examResult.getExam().getId(), examResult.getStudent().getId());
+            examResultRequest.getExam().getId(), examResultRequest.getStudent().getId());
         
+        // Carica le entità complete dal database
+        User student = userService.findById(examResultRequest.getStudent().getId());
+        Exam exam = examService.findById(examResultRequest.getExam().getId());
+        
+        // Crea un nuovo ExamResult con le entità complete
+        ExamResult examResult = new ExamResult();
+        examResult.setScore(examResultRequest.getScore());
+        examResult.setNotes(examResultRequest.getNotes());
+        examResult.setDate(examResultRequest.getDate());
+        examResult.setExam(exam);
+        examResult.setStudent(student);
+        
+        // Validazione e salvataggio
         validateExamResult(examResult);
         
         ExamResult savedResult = examResultRepository.save(examResult);
@@ -63,11 +80,21 @@ public class ExamResultService {
         log.debug("Updating exam result with id: {}", id);
         ExamResult existingResult = findById(id);
 
-        existingResult.setScore(examResult.getScore());
-        existingResult.setNotes(examResult.getNotes());
-        existingResult.setDate(examResult.getDate());
-        existingResult.setExam(examResult.getExam());
-        existingResult.setStudent(examResult.getStudent());
+        if (examResult.getScore() != null) {
+            existingResult.setScore(examResult.getScore());
+        }
+        if (examResult.getNotes() != null) {
+            existingResult.setNotes(examResult.getNotes());
+        }
+        if (examResult.getDate() != null) {
+            existingResult.setDate(examResult.getDate());
+        }
+        if (examResult.getExam() != null && examResult.getExam().getId() != null) {
+            existingResult.setExam(examService.findById(examResult.getExam().getId()));
+        }
+        if (examResult.getStudent() != null && examResult.getStudent().getId() != null) {
+            existingResult.setStudent(userService.findById(examResult.getStudent().getId()));
+        }
         
         validateExamResult(existingResult);
             
