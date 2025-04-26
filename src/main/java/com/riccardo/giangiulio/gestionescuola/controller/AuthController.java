@@ -24,11 +24,19 @@ import com.riccardo.giangiulio.gestionescuola.spring_jwt.payload.response.Messag
 import com.riccardo.giangiulio.gestionescuola.spring_jwt.util.security.jwt.JwtUtils;
 import com.riccardo.giangiulio.gestionescuola.spring_jwt.util.security.services.UserDetailsImpl;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication Controller", description = "API per l'autenticazione e la registrazione degli utenti")
 public class AuthController {
   
   @Autowired
@@ -46,8 +54,15 @@ public class AuthController {
   /**
   * Gestisce il login degli utenti.
   */
+  @Operation(summary = "Login utente", description = "Autentica un utente e restituisce un token JWT")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Autenticazione riuscita", 
+                   content = @Content(schema = @Schema(implementation = JwtResponse.class))),
+      @ApiResponse(responseCode = "401", description = "Credenziali non valide")
+  })
   @PostMapping("/signin")
-  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<?> authenticateUser(
+          @Parameter(description = "Credenziali di login") @Valid @RequestBody LoginRequest loginRequest) {
 
     Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -78,8 +93,15 @@ public class AuthController {
   /**
    * Gestisce la registrazione di nuovi utenti.
    */
+  @Operation(summary = "Registrazione utente", description = "Registra un nuovo utente nel sistema")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Registrazione completata con successo", 
+                   content = @Content(schema = @Schema(implementation = MessageResponse.class))),
+      @ApiResponse(responseCode = "400", description = "Dati di registrazione non validi o utente già esistente")
+  })
   @PostMapping("/signup")
-  public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+  public ResponseEntity<?> registerUser(
+          @Parameter(description = "Dati di registrazione") @Valid @RequestBody SignupRequest signUpRequest) {
     if (userService.existsByUsername(signUpRequest.getUsername())) {
       return ResponseEntity
           .badRequest()

@@ -82,8 +82,6 @@ public class DataLoaderRunner implements CommandLineRunner {
             System.out.println("I dati sono già stati caricati.");
             return;
         }
-        // In DataLoaderRunner, aggiungi all'inizio del metodo run:
-        System.out.println("DATA LOADER - PasswordEncoder class: " + passwordEncoder.getClass().getName()); 
         
         System.out.println("Caricamento dati di test...");
         
