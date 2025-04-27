@@ -1,0 +1,3399 @@
+{
+	"info": {
+		"_postman_id": "9f0b388f-d9df-4be4-b55e-74c6ed837817",
+		"name": "GestioneScuola",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34183979"
+	},
+	"item": [
+		{
+			"name": "UserController",
+			"item": [
+				{
+					"name": "getUserById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllUsers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserByEmail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/email/mario.rossi@scuola.it",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"email",
+								"mario.rossi@scuola.it"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createUser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Paolo\",\n  \"lastName\": \"Bianchi\",\n  \"email\": \"paolo.bianchi@scuola.it\",\n  \"password\": \"password123\",\n  \"birthDate\": \"1990-05-15\",\n  \"role\": {\n    \"id\": 2\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUser",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Gianfranco\",\n  \"lastName\": \"Bianchi\",\n  \"email\": \"paolo.bianchi@scuola.it\",\n  \"password\": \"password123\",\n  \"birthDate\": \"1990-05-15\",\n  \"role\": {\n    \"id\": 2\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users/7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUser",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllTeachers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/teachers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"teachers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllStudents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/students",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllStudentsWithoutRegistration",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/students/without-active-registration",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"students",
+								"without-active-registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getStudentsBySchoolClassId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/class/1/students",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"class",
+								"1",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTeachersBySchoolClassId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/class/1/teachers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"class",
+								"1",
+								"teachers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "assignRole",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0NTY3NjI0MSwiZXhwIjoxNzQ1NzYyNjQxfQ.96ZZm4YjcILMuGNqAFMjr9hUJd-FdKhvcBvrrcJp6qXkx0uEJ-OuNuiPFtZP1Wt34lZo5m0UukSqYQH3uaZ1Mg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/5/role?role=ROLE_STUDENT",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"5",
+								"role"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "ROLE_STUDENT"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "changePassword",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/users/1/password?currentPassword=password&newPassword=nuovapassword123",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								"1",
+								"password"
+							],
+							"query": [
+								{
+									"key": "currentPassword",
+									"value": "password"
+								},
+								{
+									"key": "newPassword",
+									"value": "nuovapassword123"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "RoleController",
+			"item": [
+				{
+					"name": "getAllRoles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/roles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getRoleById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/roles/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getRoleByName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/roles/name/ROLE_ADMIN",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles",
+								"name",
+								"ROLE_ADMIN"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createRole",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "   {\n     \"name\": \"ROLE_ADMIN\"\n   }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/roles",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteRole",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/roles/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"roles",
+								"4"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AttendanceController",
+			"item": [
+				{
+					"name": "getAttentanceById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllAttendances",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createAttendance",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"present\": false,\n  \"entryTime\": \"2025-04-30T10:05:00\",\n  \"exitTime\": \"2025-04-30T11:55:00\",\n  \"student\": {\n    \"id\": 4\n  },\n  \"lesson\": {\n    \"id\": 1\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/attendances",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateAttendances",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "   {\n     \"present\": false\n   }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteAttendances",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAttendancesByLesson",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/lesson/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"lesson",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAttendancesByStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/student/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"student",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getPresentAttendances",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/present",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"present"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAbsentAttendances",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/absent",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"absent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAttendancesByClass",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/class/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"class",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "countPresentByStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/student/4/count-present",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"student",
+								"4",
+								"count-present"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "countAbsentByStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/student/5/count-absent",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"student",
+								"5",
+								"count-absent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAttendanceByLessonAndStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/attendances/lesson/1/student/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"attendances",
+								"lesson",
+								"1",
+								"student",
+								"4"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ClassroomController",
+			"item": [
+				{
+					"name": "getClassroomById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllClassroom",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createClassroom",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Aula Magna\",\n  \"capacity\": 50\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateClassroom",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"capacity\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteClassroom",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getClassroomsByName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms/search/name?name=Laboratorio",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms",
+								"search",
+								"name"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Laboratorio"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getClassroomsByMinCapacity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms/search/capacity?minCapacity=25",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms",
+								"search",
+								"capacity"
+							],
+							"query": [
+								{
+									"key": "minCapacity",
+									"value": "25"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAvailableClassroomsInTimeRange",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms/available?start=2025-04-30T10:00:00&end=2025-04-30T12:00:00",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms",
+								"available"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2025-04-30T10:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2025-04-30T12:00:00"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getClassroomsWithSufficientCapacityForSchoolClass",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms/suitable-for-class/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms",
+								"suitable-for-class",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "isClassroomAvailableForTimeSlot",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms/1/available?start=2025-04-30T09:00:00&end=2025-04-30T11:00:00",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms",
+								"1",
+								"available"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2025-04-30T09:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2025-04-30T11:00:00"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "hasClassroomSufficientCapacity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classrooms/1/capacity-check?requiredCapacity=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classrooms",
+								"1",
+								"capacity-check"
+							],
+							"query": [
+								{
+									"key": "requiredCapacity",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CourseController",
+			"item": [
+				{
+					"name": "getCourseById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/courses/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllCourses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/courses",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createCourse",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Corso di Web Development\",\n  \"description\": \"Impara a sviluppare applicazioni web moderne con HTML, CSS e JavaScript\",\n  \"duration\": \"6 mesi\",\n  \"price\": 750.00,\n  \"subjects\": [\n    {\n      \"id\": 2\n    }\n  ],\n  \"exams\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/courses",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateCourse",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n      \"title\": \"Corso di Cyber Security\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/courses/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteCourse",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/courses/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCourseByTitle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/courses/search/title?title=Corso completo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses",
+								"search",
+								"title"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "Corso completo"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addSubjectToCourse",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/courses/1/subjects/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses",
+								"1",
+								"subjects",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeSubjectFromCourse",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/courses/1/subjects/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses",
+								"1",
+								"subjects",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addExamToCourse",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/courses/2/exams/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses",
+								"2",
+								"exams",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeExamFromCourse",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/courses/2/exams/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"courses",
+								"2",
+								"exams",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ExamResultController",
+			"item": [
+				{
+					"name": "getExamResultById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllExamResults",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createExamResult",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"score\": 85.5,\n  \"notes\": \"Buona performance, ma necessita di miglioramento nella parte pratica\",\n  \"date\": \"2023-06-01T14:30:00\",\n  \"exam\": {\n    \"id\": 1\n  },\n  \"student\": {\n    \"id\": 5\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateExamResult",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"Prestazione migliorata rispetto alla valutazione precedente\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteExamResult",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamResultsByExam",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/exam/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"exam",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamResultsByStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/student/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"student",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamResultByExamAndStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/exam/1/student/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"exam",
+								"1",
+								"student",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllPassedExamResults",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/passed",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"passed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllFailedExamResults",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/failed",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"failed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAverageScoreByExam",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/exam/1/average",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"exam",
+								"1",
+								"average"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAverageScoreByStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/student/6/average",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"student",
+								"6",
+								"average"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "countPassedByExam",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/exam/1/count-passed",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"exam",
+								"1",
+								"count-passed"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "countPassedByStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exam-results/student/5/count-passed",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exam-results",
+								"student",
+								"5",
+								"count-passed"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ExamController",
+			"item": [
+				{
+					"name": "getExamById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllExams",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createExam",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Esame di Java Avanzato\",\n  \"description\": \"Valutazione finale sulle competenze avanzate di programmazione Java\",\n  \"date\": \"2025-08-15T10:00:00\",\n  \"duration\": 120,\n  \"maxScore\": 100.0,\n  \"passingScore\": 60.0,\n  \"classroom\": {\n    \"id\": 1\n  },\n  \"subject\": {\n    \"id\": 2\n  },\n  \"schoolClass\": {\n    \"id\": 1\n  },\n  \"teacher\": {\n    \"id\": 3\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/exams",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateExam",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Esame di Java\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/exams/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteExam",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamsByTitle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/title?title=Esame di programmazione",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"title"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "Esame di programmazione"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamsByDate",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/date?date=2025-05-15T10:00:00",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"date"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2025-05-15T10:00:00"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamsBySubject",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/subject/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"subject",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamsBySchoolClass",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/class/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"class",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamsByTeacher",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/teacher/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"teacher",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamsByClassroom",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/classroom/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"classroom",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamsByCourse",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/course/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"course",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getExamsByDateRange",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/date-range?start=2025-05-01T00:00:00&end=2025-07-15T23:59:59",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"date-range"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2025-05-01T00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2025-07-15T23:59:59"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUpcomingExams",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/upcoming",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"upcoming"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getPastExams",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/exams/past",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"exams",
+								"past"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "LessonController",
+			"item": [
+				{
+					"name": "getLessonById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllLessons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createLesson",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Lezione di Java avanzato\",\n  \"description\": \"Corso intensivo su thread, concorrenza e programmazione reattiva in Java\",\n  \"startDateTime\": \"2025-09-15T14:00:00\",\n  \"endDateTime\": \"2025-09-15T16:00:00\",\n  \"schoolClass\": {\n    \"id\": 1\n  },\n  \"teacher\": {\n    \"id\": 3\n  },\n  \"classroom\": {\n    \"id\": 1\n  },\n  \"subject\": {\n    \"id\": 2\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/lessons",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateLesson",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subject\": {\n    \"id\": 2\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteLesson",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLessonsByTeacher",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/teacher/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"teacher",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLessonsBySchoolClass",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/class/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"class",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLessonsByClassroom",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/classroom/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"classroom",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLessonsBySubject",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/subject/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"subject",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getLessonsByDateRange",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/date-range?start=2025-04-30T00:00:00&end=2025-05-10T23:59:59",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"date-range"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2025-04-30T00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2025-05-10T23:59:59"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUpcomingLessonsBySchoolClass",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/class/1/upcoming",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"class",
+								"1",
+								"upcoming"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTodayLessons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/lessons/today",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"lessons",
+								"today"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "RegistrationController",
+			"item": [
+				{
+					"name": "getRegistrationById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllRegistrations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createRegistration",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"student\": {\n    \"id\": 6\n  },\n  \"course\": {\n    \"id\": 2\n  },\n  \"schoolClass\": {\n    \"id\": 2\n  },\n  \"status\": \"CANCELLED\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/registrations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateRegistration",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"COMPLETED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteRegistration",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getRegistrationsByStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/student/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"student",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getRegistrationsBySchoolClass",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/class/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"class",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getRegistrationsByStatus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/status?status=COMPLETED",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "COMPLETED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getRegistrationByStudentAndSchoolClass",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/student/4/class/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"student",
+								"4",
+								"class",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "countActiveRegistrationsBySchoolClass",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/class/1/count-active",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"class",
+								"1",
+								"count-active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getRegistrationsByCourse",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/course/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"course",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getActiveRegistrationByStudent",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/student/4/active",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"student",
+								"4",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getActiveRegistrationsBySchoolClass",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/class/1/active",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"class",
+								"1",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "changeStatus",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/registrations/1/status?status=ACTIVE",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"registrations",
+								"1",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ACTIVE"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SchoolClassController",
+			"item": [
+				{
+					"name": "getSchoolClassById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllSchoolClasses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createSchoolClass",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Classe di Informatica Avanzata\",\n  \"maxStudents\": 25,\n  \"course\": {\n    \"id\": 1\n  },\n  \"teachers\": [\n    {\n      \"id\": 2\n    }\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/classes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateSchoolClass",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"maxStudents\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/classes/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteSchoolClass",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSchoolClassesByCourse",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/course/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"course",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSchoolClassesByTeacher",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/teacher/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"teacher",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSchoolClassesByName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/name?name=Classe B",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"name"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Classe B"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAvailableSchoolClasses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/available",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"available"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getFullSchoolClasses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/full",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"full"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addTeacherToClass",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/1/teachers/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"1",
+								"teachers",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeTeacherFromClass",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/1/teachers/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"1",
+								"teachers",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAvailableSeats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/1/available-seats",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"1",
+								"available-seats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "isClassFull",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/1/is-full",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"1",
+								"is-full"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getActiveRegistrations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/classes/1/active-registrations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"classes",
+								"1",
+								"active-registrations"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SubjectController",
+			"item": [
+				{
+					"name": "getSubjectById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/subjects/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subjects",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllSubjects",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/subjects",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subjects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createSubject",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Programmazione Web\",\n  \"description\": \"Corso di programmazione web con focus su HTML, CSS e JavaScript\",\n  \"teacher\": {\n    \"id\": 2\n  }\n}\n\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/subjects",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subjects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateSubject",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"teacher\": {\n        \"id\": 3\n    }\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/subjects/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subjects",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteSubject",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/subjects/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subjects",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSubjectByName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/subjects/name?name=Matematica",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subjects",
+								"name"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Matematica"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSubjectsByCourse",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "assignTeacherToSubject",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/subjects/1/teachers/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"subjects",
+								"1",
+								"teachers",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AuthController",
+			"item": [
+				{
+					"name": "signUp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"giuseppe.verdi\",\n  \"email\": \"giuseppe.verdi@scuola.it\",\n  \"password\": \"password123\",\n  \"firstName\": \"Giuseppe\",\n  \"lastName\": \"Verdi\",\n  \"birthDate\": \"1999-05-15\",\n  \"role\": \"ROLE_STUDENT\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signIn",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"password\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/signin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ExportCSVController",
+			"item": [
+				{
+					"name": "exportStudentsToCSV",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0NTY4MDUwMCwiZXhwIjoxNzQ1NzY2OTAwfQ.tvhfjOjRDFTf3zyWJsMXlbdttlkVQ_0ZRG20RtJh2tDmto6ZSjwnrW6K0QMs9KSDHNbFaMilLwii5nO_nuO5ng",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/export/students/csv",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"export",
+								"students",
+								"csv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "exportTeachersToCSV",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0NTY4MDUwMCwiZXhwIjoxNzQ1NzY2OTAwfQ.tvhfjOjRDFTf3zyWJsMXlbdttlkVQ_0ZRG20RtJh2tDmto6ZSjwnrW6K0QMs9KSDHNbFaMilLwii5nO_nuO5ng",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/export/teachers/csv",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"export",
+								"teachers",
+								"csv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "exportRegistrationsToCSV",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0NTY4MDUwMCwiZXhwIjoxNzQ1NzY2OTAwfQ.tvhfjOjRDFTf3zyWJsMXlbdttlkVQ_0ZRG20RtJh2tDmto6ZSjwnrW6K0QMs9KSDHNbFaMilLwii5nO_nuO5ng",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/export/registrations/csv",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"export",
+								"registrations",
+								"csv"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ExportPDFController",
+			"item": [
+				{
+					"name": "exportStudentProfilePDF",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0NTY4MDUwMCwiZXhwIjoxNzQ1NzY2OTAwfQ.tvhfjOjRDFTf3zyWJsMXlbdttlkVQ_0ZRG20RtJh2tDmto6ZSjwnrW6K0QMs9KSDHNbFaMilLwii5nO_nuO5ng",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/export/student/4/profile/pdf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"export",
+								"student",
+								"4",
+								"profile",
+								"pdf"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ExportExcelController",
+			"item": [
+				{
+					"name": "exportExamsOfCoursesToExcel",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc0NTY4MDUwMCwiZXhwIjoxNzQ1NzY2OTAwfQ.tvhfjOjRDFTf3zyWJsMXlbdttlkVQ_0ZRG20RtJh2tDmto6ZSjwnrW6K0QMs9KSDHNbFaMilLwii5nO_nuO5ng",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/export/courses/exams/excel",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"export",
+								"courses",
+								"exams",
+								"excel"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
